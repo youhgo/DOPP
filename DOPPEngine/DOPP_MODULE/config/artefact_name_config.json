@@ -1,0 +1,75 @@
+ {
+   "artefacts": {
+     "system": {
+       "system_info": ["Systeminfo.csv"]
+     },
+     "orc": {
+       "orc_run_logs": ["Statistics.json", "config.xml", "Config.xml", "FastFind_result.xml", "GetThis*",
+                                 "Statistics_*.json", "_config.xml", "getthis"]
+     },
+     "network": {
+       "tcpvcon": ["Tcpvcon.txt"],
+       "arp_cache": ["arp_cache.txt"],
+       "dns_cache": ["dns_cache.txt"],
+       "netstat": ["netstat.txt"],
+       "routes": ["routes.txt"],
+       "hosts": ["hosts"],
+       "lmhosts": ["lmhosts.sam"],
+       "protocol": ["protocol$"],
+       "services": ["services$"],
+       "bits": ["BITS_jobs.txt"]
+     },
+     "hives": {
+       "NTUSER": ["NTUSER.DAT$"],
+       "AMCACHE": ["Amcache.hve$"],
+       "SOFTWARE": ["SOFTWARE$"],
+       "SYSTEM": ["SYSTEM$"],
+       "SECURITY": ["SECURITY$"],
+       "SAM": ["SAM$"]
+     },
+     "process": {
+       "process1": ["process1.csv"],
+       "process2": ["process2.csv"],
+       "autoruns": ["autoruns.csv"],
+       "sample_autoruns": ["GetSamples_autoruns.xml"],
+       "sample_timeline": ["GetSamples_timeline.csv"],
+       "sample_info": ["GetSamples_sampleinfo.csv"],
+       "handle": ["handle.txt"],
+       "enum_lock": ["Enumlocs.txt"],
+       "list_dll": ["Listdlls.txt"],
+       "ps_services": ["psService.txt"]
+     },
+     "event_logs": {
+       "evtx": [".*.evtx"]
+     },
+     "powershell": {
+       "consol_history": ["ConsoleHost_history.txt"],
+       "Module_Analysis_Cache": ["ModuleAnalysisCache"]
+     },
+     "master_file_table": {
+       "MFT": ["MFT$"]
+     },
+     "disk": {
+       "usn_journal": ["USNInfo"],
+       "VSS_List": ["VSS_list.csv"]
+     },
+     "files": {
+       "Activity_cache": ["ActivitiesCache.db"],
+       "sdb": [".*.sdb"],
+       "SRUM": ["SRUDB.dat", "SRU.*.log"],
+       "super_fetch": ["ag.*.db"],
+       "Wmi": ["OBJECTS.DATA", "INDEX.BTR", "MAPPING*.MAP"],
+       "prefetch": [".*.pf"],
+       "lnk": [".*.lnk"],
+       "recent_file": [".*-ms"]
+     },
+     "browsers": {
+       "browser_history": [".*.sqlite"]
+     },
+     "others": {
+       "event_consumer": ["EventConsumer.txt"],
+       "setup_api": ["setupapi"],
+       "mrt": ["mrt"]
+     }
+   }
+ }

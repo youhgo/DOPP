@@ -1,0 +1,15 @@
+{
+  "EvtxToJson": 1,
+  "ParseEvtx": 1,
+  "ParseProcess": 1,
+  "ParseNetwork": 1,
+  "ParsePrefetch" : 1,
+  "ParseSrum" : 1,
+  "ParseSystemHivesRr": 1,
+  "parseUserHivesRr": 1,
+  "parseSystemHivesRegipy" : 1,
+  "parseLnk": 1,
+  "parseMft" : 1,
+  "plaso" : 0,
+  "mpp": 0
+ }

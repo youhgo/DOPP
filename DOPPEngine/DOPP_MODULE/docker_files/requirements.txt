@@ -1,0 +1,10 @@
+shutils
+Flask
+celery
+redis
+py7zr
+regipy
+python-registry
+LnkParse3
+xmltodict
+analyzeMFT

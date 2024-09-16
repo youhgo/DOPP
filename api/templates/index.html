@@ -1,0 +1,249 @@
+<!-- TODO: FIX FETCH ERROR -->
+
+<div class="formbold-main-wrapper">
+  <!-- Orignal source: FormBold Team, modified by HRO-->
+  <div class="formbold-form-wrapper">
+
+    <div class="formbold-form-title">
+        <h3>DFIR ORC PARSER PROJECT</h3>
+        <p>Welcome to DOPP. <br>
+        To begin, please set a casename and upload a DFIR-ORC Ardhive</p>
+
+    <form action="#">
+        <input
+          type="text"
+          name="case-name"
+          id="case-name"
+          placeholder="Enter the name of your case"
+          class="formbold-form-input"
+        />
+        
+        <input class="input-file" id="my-file" type="file">
+        <label tabindex="0" for="my-file" class="input-file-trigger">Select a DFIR ORC Archive</label>
+        <p class="file-return"></p>
+
+        <button class="formbold-btn">
+            Send datas
+        </button>
+    </form>
+    </div>
+
+  </div>
+</div>
+
+
+<style>
+
+
+  body {
+    font-family: "Inter", sans-serif;
+  }
+  .formbold-main-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+  }
+
+  .formbold-form-wrapper {
+    text-align: center;
+    margin: 0 auto;
+    max-width: auto;
+    width: 100%;
+    background: white;
+  }
+
+  .formbold-form-title {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .formbold-form-title h3 {
+    color: #07074D;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 35px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .formbold-form-title p {
+    font-size: 16px;
+    line-height: 24px;
+    color: #536387;
+    width: 100%;
+  }
+  
+  .formbold-form-input {
+    text-align: center;
+    width: 100%;
+    padding: 14px 22px;
+    border-radius: 6px;
+    border: 1px solid #DDE3EC;
+    background: #FAFAFA;
+    font-weight: 500;
+    font-size: 16px;
+    color: #536387;
+    outline: none;
+    resize: none;
+  }
+  
+  .formbold-form-input:focus {
+    border-color: #6a64f1;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .formbold-btn {
+    text-align: center;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 14px 25px;
+    border: none;
+    font-weight: 500;
+    background-color: #6A64F1;
+    color: white;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  .formbold-btn:hover {
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
+  }
+
+
+.js .input-file-trigger {
+    text-align: center;
+    width: auto;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 14px 25px;
+    border: none;
+    font-weight: 500;
+    background-color: #6A64F1;
+    color: white;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.js .input-file {
+  position: absolute;
+  top: 0; left: 0;
+  width: auto;
+  opacity: 0;
+  padding: 14px 0;
+  cursor: pointer;
+}
+
+.js .input-file:hover + .input-file-trigger,
+.js .input-file:focus + .input-file-trigger,
+.js .input-file-trigger:hover,
+.js .input-file-trigger:focus {
+  background: #34495E;
+  color: #39D2B4;
+}
+
+.file-return {
+  margin: 0;
+}
+.file-return:not(:empty) {
+  margin: 1em 0;
+}
+.js .file-return {
+  font-style: italic;
+  font-size: .9em;
+  font-weight: bold;
+}
+.js .file-return:not(:empty):before {
+  content: "Selected file: ";
+  font-style: normal;
+  font-weight: normal;
+}
+
+
+
+/* Useless styles, just for demo styles */
+
+body {
+  font-family: "Open sans", "Segoe UI", "Segoe WP", Helvetica, Arial, sans-serif;
+  color: #7F8C9A;
+  background: #FCFDFD;
+}
+h1, h2 {
+  margin-bottom: 5px;
+  font-weight: normal;
+  text-align: center;
+  color:#aaa;
+}
+h2 {
+  margin: 5px 0 2em;
+  color: #1ABC9C;
+}
+form {
+  width: 300px;
+  margin: 0 auto;
+  text-align:center;
+}
+h2 + P {
+  text-align: center;
+}
+.txtcenter {
+  margin-top: 4em;
+  font-size: .9em;
+  text-align: center;
+  color: #aaa;
+}
+
+label {
+  /* Uniform size & alignment */
+  display: inline-block;
+  min-width: 90px;
+  text-align: right;
+}
+
+
+
+</style>
+
+
+<script>
+    document.querySelector("html").classList.add('js');
+  
+  var input  = document.querySelector( ".input-file" ),
+      button = document.querySelector( ".input-file-trigger" ),
+      the_return = document.querySelector(".file-return"),
+      btn = document.querySelector(".formbold-btn") 
+  
+  // This will upload the file after having read it
+  
+  const upload = (file) => {
+    const caseName = document.querySelector( ".formbold-form-input" );
+    const json_str = `{\"caseName\": \"${caseName.value}\"}`;
+    const request_json_info = JSON.parse(json_str);
+    const form = new FormData();
+    form.append('file', file);
+    form.append('json', request_json_info);
+  
+    fetch('https://DOPP.localhost/api/parse/parse_archive', {
+      method: 'POST',
+      body: form,
+      rejectUnauthorized: false
+    }).then(
+      response => response.json() // if the response is a JSON object
+    ).then(
+      success => console.log(success) // Handle the success response object
+    ).catch(
+      error => console.log(error) // Handle the error response object
+    );
+
+  };
+  
+  // Event handler executed when a file is selected
+  const onSelectFile = () => upload(input.files[0]);
+  
+  // It will be triggered when a file will be selected
+  btn.addEventListener('click', onSelectFile, false);
+
+input.addEventListener( "change", function( event ) { 
+  the_return.innerHTML = input.files[0].name
+});
+
+  </script>

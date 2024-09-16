@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<wolf childdebug="no" command_timeout="84600">
+
+    <archive name="DFIR-ORC_{SystemType}_{FullComputerName}.7z" keyword="All" concurrency="2" repeat="Once" compression="fast" archive_timeout="84600">
+    
+    <!-- System########################################################################################################################################### -->
+
+        <command keyword="SystemInfo">
+            <execute name="systeminfo.exe" run="%windir%\System32\systeminfo.exe" />
+            <argument>/FO csv</argument>
+            <output  name="Systeminfo.csv" source="StdOutErr" />
+        </command>
+
+    <!-- Events########################################################################################################################################### -->
+
+        <command keyword="GetEVT">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetEVT_config.xml</argument>
+            <output  name="Event.7z" source="File" argument="/out={FileName}" />
+            <output  name="Event.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="GetTextLogs">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetTextLogs_config.xml</argument>
+            <output  name="TextLogs.7z" source="File" argument="/out={FileName}" />
+            <output  name="TextLogs.log" source="StdOutErr" />
+        </command>
+
+    <!-- Process########################################################################################################################################### -->
+
+        <command keyword="Autoruns">
+            <execute name="autorunsc.exe" run="7z:#Tools|autorunsc.exe"/>
+            <argument>-accepteula -c -h -s -t -a * *</argument>
+            <output name="autoruns.csv" source="StdOut"/>
+            <output name="autoruns.log" source="StdErr"/>
+        </command>
+
+        <command keyword="Handle">
+            <execute name="handle.exe" run="7z:#Tools|handle.exe" />
+            <argument>/accepteula</argument>
+            <argument>/a</argument>
+            <output name="handle.txt" source="StdOutErr" />
+        </command>
+
+        <command keyword="Listdlls">
+            <execute name="Listdlls.exe" run="7z:#Tools|Listdlls.exe" />
+            <argument>/accepteula</argument>
+            <output name="Listdlls.txt" source="StdOutErr" />
+        </command>
+
+        <command keyword="Processes1" winver="6.0+" >
+            <execute name="powershell" run="%SystemRoot%\System32\WindowsPowerShell\V1.0\powershell.exe"/>
+            <argument>-NonInteractive -WindowStyle Hidden -NoProfile</argument>
+            <argument>Get-WMIObject win32_process | Export-Csv -NoTypeInformation -Encoding UTF8</argument>
+            <output  name="processes1.csv" source="File" argument="-Path {FileName}" />
+            <output  name="processes1.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="Processes2" winver="6.0+" >
+            <execute name="powershell" run="%SystemRoot%\System32\WindowsPowerShell\V1.0\powershell.exe"/>
+            <argument>-NonInteractive -WindowStyle Hidden -NoProfile</argument>
+            <argument>Get-Process | Export-Csv -NoTypeInformation -Encoding UTF8</argument>
+            <output  name="processes2.csv" source="File" argument="-Path {FileName}" />
+            <output  name="processes2.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="PsService">
+            <execute name="PsService.exe" run="7z:#Tools|PsService.exe" />
+            <argument>/accepteula</argument>
+            <output name="psService.txt" source="StdOutErr" />
+        </command>
+
+
+    <!-- Network########################################################################################################################################### -->
+        <command keyword="Route">
+            <execute name="route.exe" run="%windir%\System32\route.exe" />
+            <argument>PRINT</argument>
+            <output  name="routes.txt" source="StdOutErr" />
+        </command>
+
+        <command keyword="Dns_cache">
+            <execute name="ipconfig.exe" run="%windir%\System32\ipconfig.exe"/>
+            <argument>/displaydns</argument>
+            <output  name="dns_cache.txt"  source="StdOutErr" />
+        </command>
+
+        <command keyword="Tcpvcon">
+            <execute name="Tcpvcon.exe" run="7z:#Tools|Tcpvcon.exe" />
+            <argument>/accepteula -a -n -c</argument>
+            <output  name="Tcpvcon.txt" source="StdOutErr" />
+        </command>
+
+        <command keyword="Netstat">
+            <execute name="netstat.exe" run="%windir%\System32\netstat.exe"/>
+            <argument>-a -n -o</argument>
+            <output  name="netstat.txt" source="StdOutErr" />
+        </command>
+
+        <command keyword="BITS_jobs" winver="6.0+">
+            <execute name="bitsadmin.exe" run="%windir%\System32\bitsadmin.exe" />
+            <argument>/list /allusers /verbose</argument>
+            <output  name="BITS_jobs.txt" source="StdOutErr" />
+        </command>
+
+        <command keyword="Arp_cache">
+            <execute name="arp.exe" run="%windir%\System32\arp.exe" />
+            <argument>-a</argument>
+            <output  name="arp_cache.txt"  source="StdOutErr" />
+        </command>
+
+        <command keyword="DNS_records" systemtype="DomainController|Server" winver="6.0+" >
+            <execute name="powershell" run="%SystemRoot%\System32\WindowsPowerShell\V1.0\powershell.exe"/>
+            <argument>-NonInteractive -WindowStyle Hidden -NoProfile</argument>
+            <argument>if (Get-Command Get-DnsServerZone -CommandType Function -ErrorAction SilentlyContinue) { Get-DnsServerZone | ForEach-Object {write-host '' ; write-host '***' $_.ZoneName '***' ; write-host '' ; Get-DnsServerResourceRecord -ZoneName ($_.ZoneName)} } else { Get-WmiObject -Namespace root\MicrosoftDNS MicrosoftDNS_Domain | ? { $_.ContainerName -NotLike '..RootHints' -And $_.ContainerName -NotLike '..Cache' } | select ContainerName | Sort-Object ContainerName | Get-Unique -AsString | % { dnscmd /zoneprint $_.ContainerName } }</argument>
+            <output  name="DNS_records.txt" source="StdOut" />
+            <output  name="DNS_records.log" source="StdErr" />
+        </command>
+
+        <command keyword="ADComputers" systemtype="DomainController" winver="6.0+" >
+            <execute name="powershell" run="%SystemRoot%\System32\WindowsPowerShell\V1.0\powershell.exe"/>
+            <argument>-NonInteractive -WindowStyle Hidden -NoProfile</argument>
+            <argument>Import-Module ActiveDirectory ; $TimeAgo = (Get-Date).AddMonths(-3) ; Get-ADComputer -Filter {enabled -eq $true -and lastLogonTimeStamp -gt $TimeAgo} -Properties DNSHostName | Select DNSHostName | ConvertTo-Csv</argument>
+            <output  name="AD_computers.csv" source="StdOut" />
+            <output  name="AD_computers.log" source="StdErr" />
+        </command>
+
+    <!-- Hive########################################################################################################################################### -->
+
+        <command keyword="GetSystemHives">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetSystemHives_config.xml /shadows</argument>
+            <output  name="SystemHives.7z" source="File" argument="/out={FileName}" />
+            <output  name="SystemHives.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="GetUserHives">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetUserHives_config.xml /shadows</argument>
+            <output  name="UserHives.7z" source="File" argument="/out={FileName}" />
+            <output  name="UserHives.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="GetSamHive">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetSamHive_config.xml</argument>
+            <output  name="SAM.7z" source="File" argument="/out={FileName}" />
+            <output  name="SAM.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="EventConsumer"  winver="6.0+">
+            <execute name="powershell" run="%SystemRoot%\System32\WindowsPowerShell\V1.0\powershell.exe"/>
+            <argument>-NonInteractive -WindowStyle Hidden -NoProfile</argument>
+            <argument>Get-WMIObject -Namespace root\Subscription -Class __EventConsumer</argument>
+            <output  name="EventConsumer.txt" source="StdOut" />
+            <output  name="EventConsumer.log" source="StdErr" />
+        </command>
+
+    <!-- Disks########################################################################################################################################### -->
+        <command keyword="GetMFT">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetMFT_config.xml</argument>
+            <output  name="MFT.7z" source="File" argument="/out={FileName}" />
+            <output  name="MFT.log" source="StdOutErr" />
+        </command>
+        
+        <!-- NTFSINFO
+        <command keyword="NTFSInfo_little" queue="flush">
+            <execute name="Orc.exe" run="self:#NTFSInfo" />
+            <argument>/config=res:#NTFSInfo_little_config.xml</argument>
+            <output name="NTFSInfo_detail.7z" source="File" argument="/out={FileName}" />
+            <output name="NTFSInfo_detail.log" source="StdOutErr" />
+        </command>
+        -->
+
+        <command keyword="USNInfo_systemdrive" queue="flush">
+            <execute name="Orc.exe" run="self:#USNInfo" />
+            <argument>%SystemDrive%\</argument>
+            <output name="USNInfo.7z" source="File" argument="/out={FileName}" />
+            <output name="USNInfo.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="VSS_list">
+            <execute name="Orc.exe" run="self:#NTFSUtil" />
+            <argument>/VSS</argument>
+            <output  name="VSS_list.csv" source="File" argument="/out={FileName}" />
+            <output  name="VSS_list.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="EnumLocs">
+            <execute name="Orc.exe" run="self:#NTFSUtil" />
+            <argument>/enumlocs</argument>
+            <output name="Enumlocs.txt" source="StdOutErr" />
+        </command>
+
+
+    <!-- code########################################################################################################################################### -->
+
+
+    <!-- Browser########################################################################################################################################### -->
+        <command keyword="GetBrowsersHistory">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetBrowsersHistory_config.xml</argument>
+            <output  name="Browsers_history.7z" source="File" argument="/out={FileName}" />
+            <output  name="Browsers_history.log" source="StdOutErr" />
+        </command>
+
+        <command keyword="GetBrowsersArtefacts">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetBrowsersArtefacts_config.xml</argument>
+            <output  name="Browsers_artefacts.7z" source="File" argument="/out={FileName}" />
+            <output  name="Browsers_artefacts.log" source="StdOutErr" />
+        </command>
+
+    <!-- Files########################################################################################################################################### -->
+
+        <command keyword="GetSamples">
+            <execute name="Orc.exe" run="self:#GetSamples" />
+            <argument>/config=res:#GetSamples_config.xml</argument>
+            <output  name="Process_Autoruns.xml"  source="File"  argument="/autoruns={FileName}" />
+            <output  name="Process_sampleinfo.csv"  source="File"  argument="/sampleinfo={FileName}" />
+            <output  name="Process_timeline.csv"  source="File"  argument="/timeline={FileName}" />
+        </command>
+
+        <command keyword="GetArtefacts">
+            <execute name="Orc.exe" run="self:#GetThis" />
+            <argument>/config=res:#GetArtefacts_config.xml</argument>
+            <output  name="Artefacts.7z" source="File" argument="/out={FileName}" />
+            <output  name="Artefacts.log" source="StdOutErr" />
+        </command>
+
+    </archive>
+
+</wolf>
