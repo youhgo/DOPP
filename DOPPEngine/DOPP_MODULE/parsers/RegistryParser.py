@@ -27,7 +27,6 @@ class RegistryParser:
         :param dir_out: str : path to result folder
         :return:
         """
-        print("parsing amcache")
         hv_name = os.path.basename(file_path)
         reg = RegistryHive(file_path)
         path_out_csv = os.path.join(dir_out, "{}_regpy.csv".format(hv_name))

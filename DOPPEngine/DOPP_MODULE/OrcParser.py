@@ -16,6 +16,7 @@ from .parsers import (EventParser, ProcessParser, PrefetchParser, NetWorkParser,
 # TODO: CREATE JSON OUTPUT FOR EVERY PARSER
 # TODO: AD_computer.csv to parse
 # TODO: Clean Duplicates
+# TODO: Parse APPCOMPAT from system hive
 
 class OrcPaser:
     """
@@ -343,7 +344,7 @@ class OrcPaser:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [HIVE] [REGRIPPER]")
-            l_hive_to_search = self.get_dict_value_as_list(self.artefact_config.get("artefacts", {}).get("hives", {}))
+            l_hive_to_search = self.get_dict_value_as_list(self.artefact_config.get("artefacts", {}).get("hives", []))
             mngr = FileManager.FileManager()
             for hive_patern in l_hive_to_search:
                 hive_files = mngr.recursive_file_search(self.extracted_dir, hive_patern)
@@ -353,15 +354,17 @@ class OrcPaser:
                         self.logger_run.print_info_start_sub_2("parsing {}".format(hv_name))
 
                         out_file = os.path.join(self.hiveDirRR, hv_name.replace("*", "")+".txt")
-                        my_cmd = ["rip.pl", "-r", "{}".format(hive_file), "-at", "-g"]
-                        with open(out_file, "a") as outfile:
-                            subprocess.run(my_cmd, stdout=outfile)
-                        if "Amcache.hve" in hv_name:
+                        try:
+                            my_cmd = ["rip.pl", "-r", "{}".format(hive_file), "-at", "-g"]
+                            with open(out_file, "a") as outfile:
+                                subprocess.run(my_cmd, stdout=outfile)
+
                             self.logger_run.print_info_start_sub_2("sorting {}".format(hv_name))
-                            self.convert_epoch_and_sort(out_file, os.path.join(self.result_parsed_dir, "amcache_rr.csv"))
-                    self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
-
-
+                            self.convert_epoch_and_sort(out_file, os.path.join(self.result_parsed_dir, "{}.csv".format(hv_name)))
+                            self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
+                        except:
+                            self.logger_run.print_info_failed_sub_2("parsing {}".format(hv_name))
+                            self.logger_debug.print_error_failed(traceback.format_exc())
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [HIVE] [REGRIPPER]")
         except:
@@ -684,7 +687,7 @@ class OrcPaser:
             self.parse_usnjrnl()
             self.logger_run.print_info_finished("[MFT]")
 
-        self.clean_duplicates(self.result_parsed_dir)
+        #self.clean_duplicates(self.result_parsed_dir) # Need to be fixed
 
         if self.parser_config.get("plaso"):
             self.logger_run.print_info_start("[TIMELINE]")

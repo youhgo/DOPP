@@ -28,9 +28,9 @@ class ProcessParser:
                 "process1": "process1.csv",
                 "process2": "process2.csv",
                 "autoruns": "autoruns.csv",
-                "sample_autoruns": "GetSamples_autoruns.xml",
-                "sample_timeline": "GetSamples_timeline.csv",
-                "sample_info": "GetSamples_sampleinfo.csv"
+                "sample_autoruns": ["GetSamples_autoruns.xml", "Process_Autoruns.xml"],
+                "sample_timeline": ["GetSamples_timeline.csv", "Process_timeline.csv"],
+                "sample_info": ["GetSamples_sampleinfo.csv", "Process_sampleinfo.csv"]
                 }
         else:
             self.artefact_config = artefact_config
@@ -356,21 +356,17 @@ class ProcessParser:
             for process2_file in process2_files:
                 self.parse_process2(process2_file)
 
-        process_autoruns_files = self.recursive_file_search(input_dir, self.artefact_config.get("sample_autoruns", ""))
-        if process_autoruns_files:
-            for process_autoruns_file in process_autoruns_files:
+        for pattern in self.artefact_config.get("sample_autoruns", ""):
+            for process_autoruns_file in self.recursive_file_search(input_dir, pattern):
                 self.parse_process_autoruns(process_autoruns_file)
-
-        process_timeline_files = self.recursive_file_search(input_dir, self.artefact_config.get("sample_timeline", ""))
-        if process_timeline_files:
-            for process_timeline_file in process_timeline_files:
+                
+        for pattern in self.artefact_config.get("sample_timeline", ""):
+            for process_timeline_file in self.recursive_file_search(input_dir, pattern):
                 self.parse_process_timeline(process_timeline_file)
 
-        process_info_files = self.recursive_file_search(input_dir, self.artefact_config.get("sample_info", ""))
-        if process_info_files:
-            for process_info_file in process_info_files:
+        for pattern in self.artefact_config.get("sample_info", ""):
+            for process_info_file in self.recursive_file_search(input_dir, pattern):
                 self.parse_process_infos(process_info_file)
-
 
 
 def parse_args():

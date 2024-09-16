@@ -1,10 +1,10 @@
-# How to Use
+# How to Use DOPP
 
 DOPP is really easy to use thanks to the API
 
-## Upload an archive
+## DOPP API
 
-### With the API
+### Parsing URL
 The API Endpoint to send an archive is this one: https://youDOPPAdress/api/parse/parse_archive
 
 The Endpoint is waiting for the archive file and a json parameter
@@ -32,7 +32,7 @@ The final JSON must look like that :
   "parseLnk": 1,
   "parseMft" : 1,
   "plaso" : 1,
-  "mpp": 0
+  "mpp": 1
  }
 }
 ```
@@ -59,24 +59,36 @@ The response will give you 3 URL and an id:
 * StatusUrl will display if whether or not the task is finished;
 * taskID is the ID of your task.
 
+### check URL
+This endpoint allows you to check if a task is still running or not, you must provide the ask id provided when using the parsing url
 ```bash 
 https://DOPP.localhost/api/check/<string:task_id>
 ```
+
+### debug log URL
+This endpoint allows you to check the debuglogs of the task
 ```bash 
 https://DOPP.localhost/api/debug_log/<string:task_id>
 ```
+
+### run log URL
+This endpoint allows you to check the run logs of the task
 ```bash 
 https://DOPP.localhost/api/running_log/<string:task_id>
 ```
+
+### running task url
+This endpoint return all running task's ids 
 ```bash 
 https://DOPP.localhost/api/get_running_tasks
 ```
+
+### stop task url
+This endpoint allow you to stop a task by providing it's id
 ```bash 
 https://DOPP.localhost/api/stop_analyze_tasks
 ```
-```bash 
-https://DOPP.localhost/api/get_running_tasks_parse
-```
+
 
 
 

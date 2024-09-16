@@ -1,5 +1,13 @@
 # Dfir ORC Parser Project
 
+
+To have more info about DOPP:
+
+* How to install DOPP, tutorial [here](https://youhgo.github.io/DOPP-how-to-install-EN/)
+* How to use DOPP, tutorial [here](https://youhgo.github.io/DOPP-how-to-use-EN/)
+* DOPP result architecture, explained [here](https://youhgo.github.io/DOPP-Results/)
+
+
 ## What is DOPP ?
 
 DOPP for DFIR ORC Parser Project is a python tool use to parse artefact collected by ANSSI [DFIR-ORC](https://github.com/dfir-orc).
@@ -84,9 +92,6 @@ Container used are :
 
 Everything is enclosed to the docker-compose.yml and Dockerfile
 
-By default, DOPP use only one worker. However, it is possible to add multiple worker to be able parse multiple archive at the same time
-Please see the tutorial [here](./ressources/documentation/how_to_add_worker.md)
- 
 
 
 
