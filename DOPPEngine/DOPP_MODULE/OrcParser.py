@@ -310,7 +310,6 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[PARSING] [PREFETCH]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
-    #TODO : do the file research better
     def parse_srum(self):
         """
         To parse srum files to the human readable format Date|Time|ID|ETC
@@ -337,15 +336,18 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[PARSING] [SRUM]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
-    def parse_system_hives_rr(self):
+    def parse_hives_rr(self):
         """
         To parse systems hives files with RegRipper
         :return:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [HIVE] [REGRIPPER]")
+
             l_hive_to_search = self.get_dict_value_as_list(self.artefact_config.get("artefacts", {}).get("hives", []))
             mngr = FileManager.FileManager()
+            reg_parser = RegistryParser.RegistryParser()
+
             for hive_patern in l_hive_to_search:
                 hive_files = mngr.recursive_file_search(self.extracted_dir, hive_patern)
                 if hive_files:
@@ -359,12 +361,12 @@ class OrcPaser:
                             with open(out_file, "a") as outfile:
                                 subprocess.run(my_cmd, stdout=outfile)
 
-                            self.logger_run.print_info_start_sub_2("sorting {}".format(hv_name))
-                            self.convert_epoch_and_sort(out_file, os.path.join(self.result_parsed_dir, "{}.csv".format(hv_name)))
+                            reg_parser.parse_hive_from_rr(hv_name, out_file, self.result_parsed_dir)
                             self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
                         except:
                             self.logger_run.print_info_failed_sub_2("parsing {}".format(hv_name))
                             self.logger_debug.print_error_failed(traceback.format_exc())
+
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [HIVE] [REGRIPPER]")
         except:
@@ -387,7 +389,7 @@ class OrcPaser:
                 for hv in security_hive:
                     hv_name = os.path.basename(hv)
                     self.logger_run.print_info_start_sub_2("parsing {}".format(hv_name))
-                    reg_parser.parse_security(hv, self.hiveDirRegipy)
+                    reg_parser.parse_security_regpy(hv, self.hiveDirRegipy)
                     self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
 
             system_hive_paterns = self.artefact_config.get("artefacts", {}).get("hives", {}).get("SYSTEM")
@@ -395,7 +397,7 @@ class OrcPaser:
                 system_hive = mngr.recursive_file_search(self.extracted_dir, system_hive_patern)
                 for hv in system_hive:
                     self.logger_run.print_info_start_sub_2("parsing {}".format(hv_name))
-                    reg_parser.parse_system(hv, self.hiveDirRegipy)
+                    reg_parser.parse_system_regpy(hv, self.hiveDirRegipy)
                     self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
 
             software_hive_paterns = self.artefact_config.get("artefacts", {}).get("hives", {}).get("SOFTWARE")
@@ -404,14 +406,14 @@ class OrcPaser:
                 for hv in software_hive:
                     self.logger_run.print_info_start_sub_2("parsing {}".format(hv_name))
                     self.logger_run.print_info_failed_sub_2("Regipy can't handle SOFTWARE Hive")
-                    # reg_parser.parse_security(hv, self.hiveDirRegipy)
+                    # reg_parser.parse_software_regpy(hv, self.hiveDirRegipy)
 
             amcache_hive_paterns = self.artefact_config.get("artefacts", {}).get("hives", {}).get("AMCACHE")
             for amcache_hive_patern in amcache_hive_paterns:
                 amcache_hive = mngr.recursive_file_search(self.extracted_dir, amcache_hive_patern)
                 for hv in amcache_hive:
                     self.logger_run.print_info_start_sub_2("parsing {}".format(hv_name))
-                    reg_parser.parse_amcache(hv, self.result_parsed_dir)
+                    reg_parser.parse_amcache_regpy(hv, self.result_parsed_dir)
                     self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [HIVE] [REGIPY]")
@@ -494,7 +496,7 @@ class OrcPaser:
             for line in lies:
                 f.write(line)
 
-    def convert_epoch_and_sort(self, in_file, out_file):
+    def convert_epoch_and_sort(self, in_file):
         """Trie un fichier CSV par date décroissante et convertit les timestamps en place.
 
         Args:
@@ -521,10 +523,7 @@ class OrcPaser:
                     line[0] = formatted_timestamp
                 except:
                     continue
-
-        with open(out_file, 'a') as res_file:
-            writer = csv.writer(res_file, delimiter='|')
-            writer.writerows(lines)
+        return lines
 
     def plaso_all(self):
         self.l2t()
@@ -676,7 +675,7 @@ class OrcPaser:
         if self.parser_config.get("ParseSrum"):
             self.parse_srum()
         if self.parser_config.get("ParseSystemHivesRr"):
-            self.parse_system_hives_rr()
+            self.parse_hives_rr()
         if self.parser_config.get("parseSystemHivesRegipy"):
             self.parse_system_hives_regipy()
         self.logger_run.print_info_finished("[REGISTRY]")

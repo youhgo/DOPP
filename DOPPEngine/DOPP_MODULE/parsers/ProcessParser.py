@@ -359,7 +359,7 @@ class ProcessParser:
         for pattern in self.artefact_config.get("sample_autoruns", ""):
             for process_autoruns_file in self.recursive_file_search(input_dir, pattern):
                 self.parse_process_autoruns(process_autoruns_file)
-                
+
         for pattern in self.artefact_config.get("sample_timeline", ""):
             for process_timeline_file in self.recursive_file_search(input_dir, pattern):
                 self.parse_process_timeline(process_timeline_file)

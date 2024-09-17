@@ -8,6 +8,9 @@ import traceback
 from pathlib import Path
 from regipy.registry import RegistryHive
 from regipy.plugins.utils import run_relevant_plugins
+import datetime
+import csv
+
 
 class RegistryParser:
     """
@@ -20,7 +23,7 @@ class RegistryParser:
         """
         pass
 
-    def parse_amcache(self, file_path, dir_out):
+    def parse_amcache_regpy(self, file_path, dir_out):
         """
         Main function to parse amcache with regippy
         :param file_path: str : path to the amcache file
@@ -31,25 +34,27 @@ class RegistryParser:
         reg = RegistryHive(file_path)
         path_out_csv = os.path.join(dir_out, "{}_regpy.csv".format(hv_name))
         path_out_json = os.path.join(dir_out, "{}_regpy.json".format(hv_name))
+        try:
+            parsed = run_relevant_plugins(reg, as_json=True)
+            with open(path_out_json, "w") as outfile:
+                json.dump(parsed, outfile, indent=4)
 
-        parsed = run_relevant_plugins(reg, as_json=True)
-        with open(path_out_json, "w") as outfile:
-            json.dump(parsed, outfile, indent=4)
+            entry = parsed.get("amcache", [])
+            l_not_sorted = []
+            header_list = ["Date", "Time", "Name", "Hash"]
+            for val in entry:
+                timestamp = val.get("timestamp")
+                name = val.get("original_file_name", "-")
+                sha1 = val.get("sha1", "-")
+                output = "{}|{}|{}".format(timestamp, name, sha1)
+                l_not_sorted.append(output)
 
-        entry = parsed.get("amcache", [])
-        l_not_sorted = []
-        header_list = ["Date", "Time", "Name", "Hash"]
-        for val in entry:
-            timestamp = val.get("timestamp")
-            name = val.get("original_file_name", "-")
-            sha1 = val.get("sha1", "-")
-            output = "{}|{}|{}".format(timestamp, name, sha1)
-            l_not_sorted.append(output)
+            if l_not_sorted:
+                self.format_and_write_to_csv(path_out_csv, l_not_sorted, header_list)
+        except:
+            print(traceback.format_exc())
 
-        if l_not_sorted:
-            self.format_and_write_to_csv(path_out_csv, l_not_sorted, header_list)
-
-    def parse_software(self, file_path, dir_out):
+    def parse_software_regpy(self, file_path, dir_out):
         """
         Main function to parse software hive with regippy
         :param file_path: str : path to the software file
@@ -62,19 +67,22 @@ class RegistryParser:
         path_out_csv = os.path.join(dir_out, "{}_regpy.csv".format(hv_name))
         path_out_json = os.path.join(dir_out, "{}_regpy.json".format(hv_name))
         # Iterate over a registry hive recursively:
-        parsed = run_relevant_plugins(reg, as_json=True)
-        with open(path_out_json, "w") as outfile:
-            json.dump(parsed, outfile, indent=4)
+        try:
+            parsed = run_relevant_plugins(reg, as_json=True)
+            with open(path_out_json, "w") as outfile:
+                json.dump(parsed, outfile, indent=4)
 
-        with open(path_out_csv, 'w') as file_out:
-            for value in parsed.values():
-                for key in value:
-                    if type(key) == dict:
-                        key = json.dumps(key).replace(",", "|").replace("{", "|").replace("}", "|")
-                    file_out.write(key)
-                    file_out.write("\n")
+            with open(path_out_csv, 'w') as file_out:
+                for value in parsed.values():
+                    for key in value:
+                        if type(key) == dict:
+                            key = json.dumps(key).replace(",", "|").replace("{", "|").replace("}", "|")
+                        file_out.write(key)
+                        file_out.write("\n")
+        except:
+            print(traceback.format_exc())
 
-    def parse_system(self, file_path, dir_out):
+    def parse_system_regpy(self, file_path, dir_out):
         """
         Main function to parse system hive with regippy
         :param file_path: str : path to the software file
@@ -87,19 +95,22 @@ class RegistryParser:
         path_out_csv = os.path.join(dir_out, "{}_regpy.csv".format(hv_name))
         path_out_json = os.path.join(dir_out, "{}_regpy.json".format(hv_name))
         # Iterate over a registry hive recursively:
-        parsed = run_relevant_plugins(reg, as_json=True)
-        with open(path_out_json, "w") as outfile:
-            json.dump(parsed, outfile, indent=4)
+        try:
+            parsed = run_relevant_plugins(reg, as_json=True)
+            with open(path_out_json, "w") as outfile:
+                json.dump(parsed, outfile, indent=4)
 
-        with open(path_out_csv, 'w') as file_out:
-            for value in parsed.values():
-                for key in value:
-                    if type(key) == dict:
-                        key = json.dumps(key).replace(",", "|").replace("{", "|").replace("}", "|")
-                    file_out.write(key)
-                    file_out.write("\n")
+            with open(path_out_csv, 'w') as file_out:
+                for value in parsed.values():
+                    for key in value:
+                        if type(key) == dict:
+                            key = json.dumps(key).replace(",", "|").replace("{", "|").replace("}", "|")
+                        file_out.write(key)
+                        file_out.write("\n")
+        except:
+            print(traceback.format_exc())
 
-    def parse_security(self, file_path, dir_out):
+    def parse_security_regpy(self, file_path, dir_out):
         """
         Main function to parse security hive with regippy
         :param file_path: str : path to the software file
@@ -113,19 +124,22 @@ class RegistryParser:
         path_out_csv = os.path.join(dir_out, "{}_regpy.csv".format(hv_name))
         path_out_json = os.path.join(dir_out, "{}_regpy.json".format(hv_name))
         # Iterate over a registry hive recursively:
-        parsed = run_relevant_plugins(reg, as_json=True)
-        with open(path_out_json, "w") as outfile:
-            json.dump(parsed, outfile, indent=4)
+        try:
+            parsed = run_relevant_plugins(reg, as_json=True)
+            with open(path_out_json, "w") as outfile:
+                json.dump(parsed, outfile, indent=4)
 
-        with open(path_out_csv, 'a') as file_out:
-            for value in parsed.values():
-                for key in value:
-                    if type(key) == dict:
-                        key = json.dumps(key).replace(",", "|").replace("{", "|").replace("}", "|")
-                    file_out.write(key)
-                    file_out.write("\n")
+            with open(path_out_csv, 'a') as file_out:
+                for value in parsed.values():
+                    for key in value:
+                        if type(key) == dict:
+                            key = json.dumps(key).replace(",", "|").replace("{", "|").replace("}", "|")
+                        file_out.write(key)
+                        file_out.write("\n")
+        except:
+            print(traceback.format_exc())
 
-    def parse_ntuser(self, file_path, dir_out):
+    def parse_ntuser_regpy(self, file_path, dir_out):
         """
         Main function to parse ntuser hive with regippy
         :param file_path: str : path to the ntuser file
@@ -135,7 +149,7 @@ class RegistryParser:
         #Not done yet
         pass
 
-    def parse_shimcash(self, file_path, dir_out):
+    def parse_shimcash_regpy(self, file_path, dir_out):
         """
         Main function to parse shimcash app compat hive with regippy
         :param file_path: str : path to the appcompat file
@@ -145,7 +159,7 @@ class RegistryParser:
         #Not done yet
         pass
 
-    def parse_all(self, dir_to_reg, out_folder):
+    def parse_all_regpy(self, dir_to_reg, out_folder):
         """
         Main function to parse all hive with regippy
         :param dir_to_reg: str : path to the folder containing all hives to parse
@@ -157,14 +171,14 @@ class RegistryParser:
         if search:
             relative_file_path = Path(os.path.join(dir_to_reg, search[0]))
             absolute_file_path = relative_file_path.absolute()  # absolute is a Path object
-            reg_parser.parse_amcache(absolute_file_path, out_folder)
+            reg_parser.parse_amcache_regpy(absolute_file_path, out_folder)
 
         search = [f for f in os.listdir(dir_to_reg) if
                   re.search(r'SECURITY', f)]
         if search:
             relative_file_path = Path(os.path.join(dir_to_reg, search[0]))
             absolute_file_path = relative_file_path.absolute()  # absolute is a Path object
-            reg_parser.parse_security(absolute_file_path, out_folder)
+            reg_parser.parse_security_regpy(absolute_file_path, out_folder)
 
         search = [f for f in os.listdir(dir_to_reg) if
                   re.search(r'SYSTEM', f)]
@@ -224,6 +238,63 @@ class RegistryParser:
         l_formated.insert(0, "|".join(header))
         self.write_report_as_csv_file(out_file, l_formated)
 
+    def convert_epoch_and_sort(self, in_file):
+        """sort a CSV by date and convert epoch ts to current.
+
+        Args:
+            in_file (str): path to csv file.
+        """
+
+        with open(in_file, 'r') as file:
+            next(file)
+            reader = csv.reader(file, delimiter='|')
+            lines = list(reader)
+
+            def sort_key(ligne):
+                try:
+                    timestamp = int(ligne[0])
+                    return datetime.datetime.fromtimestamp(timestamp)
+                except:
+                    return datetime.datetime.now()
+
+            lines.sort(key=sort_key, reverse=False)
+            for line in lines:
+                try:
+                    timestamp = int(line[0])
+                    formatted_timestamp = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d|%H:%M:%S")
+                    line[0] = formatted_timestamp
+                except:
+                    continue
+        return lines
+
+    def parse_hive_from_rr(self, hv_name, path_to_hive, path_to_result_dir):
+        try:
+            processed = self.convert_epoch_and_sort(path_to_hive)
+
+            with open(os.path.join(path_to_result_dir, "{}.csv".format(hv_name)), 'a') as res_file:
+                writer = csv.writer(res_file, delimiter='|')
+                writer.writerows(processed)
+
+            if "system" in hv_name.lower():
+                l_shimcache = self.get_shimcache_from_system_rr(processed)
+
+                with open(os.path.join(path_to_result_dir, "appcompat.csv"), 'a') as res_file:
+                    for line in l_shimcache:
+                        res_file.write(line)
+                        res_file.write("\n")
+        except:
+            print(traceback.format_exc())
+
+    def get_shimcache_from_system_rr(self, l_system):
+        l_shimcache = ["DATE|TIME|ENTRY"]
+        for line in l_system:
+            if len(line) >= 4:
+                if "AppCompatCache" in line[4]:
+                        date_time = line[0]
+                        entry = line[4].replace("M...", "").replace("AppCompatCache", "").lstrip()
+                        l_shimcache.append("{}|{}".format(date_time, entry))
+        return l_shimcache
+
 
 def verify(regfile, reg_type):
     """
@@ -243,58 +314,3 @@ def verify(regfile, reg_type):
                 return True
             else:
                 continue
-
-
-def parse_args():
-    """
-        Function to parse args
-    """
-
-    argument_parser = argparse.ArgumentParser(description=(
-        'Parser for hives artefacts'))
-
-    argument_parser.add_argument('-f', '--file', action="store",
-                                 required=False, dest="reg_file", default=False,
-                                 help="path to the input reg file")
-
-    argument_parser.add_argument('-d', '--directory', action="store",
-                                 required=False, dest="reg_dir", default=False,
-                                 help="path to the ref directory")
-
-    argument_parser.add_argument("-o", "--output", action="store",
-                                 required=True, dest="output_dir", default=False,
-                                 help="dest where the result will be written")
-
-    argument_parser.add_argument('-t', '--type', action="store",
-                                 required=False, dest="reg_type", default="",
-                                 help="registry type : SYSTEM, SOFTWARE, AMCACHE, SECURITY")
-
-    return argument_parser
-
-
-if __name__ == '__main__':
-    parser = parse_args()
-    args = parser.parse_args()
-    reg_parser = RegistryParser()
-
-    if args.reg_dir:
-        reg_parser.parse_all(args.reg_dir, args.output_dir)
-    elif args.reg_file:
-        if not args.reg_type:
-            print("-t flag is required with a single hive file")
-            parser.print_help()
-            sys.exit()
-        if args.reg_type.upper() == "SYSTEM":
-            verify(args.reg_file, args.reg_type)
-            reg_parser.parse_system(args.reg_file, args.output_dir)
-        if args.reg_type.upper() == "SOFTWARE":
-            verify(args.reg_file, args.reg_type)
-            reg_parser.parse_software(args.reg_file, args.output_dir)
-        if args.reg_type.upper() == "SECURITY":
-            verify(args.reg_file, args.reg_type)
-            reg_parser.parse_security(args.reg_file, args.output_dir)
-        if args.reg_type.upper() == "AMCACHE":
-            verify(args.reg_file, args.reg_type)
-            reg_parser.parse_amcache(args.reg_file, args.output_dir)
-    else:
-        parser.print_help()

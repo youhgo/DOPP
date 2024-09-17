@@ -448,12 +448,12 @@ class OrcPaser:
                     if "SYSTEM" in hv_name.upper():
                         reg_parser.parse_system(hv, self.hiveDirRegipy)
                     if "SECURITY" in hv_name.upper():
-                        reg_parser.parse_security(hv, self.hiveDirRegipy)
+                        reg_parser.parse_security_regpy(hv, self.hiveDirRegipy)
                     if "SOFTWARE" in hv_name.upper():
                         self.logger_run.print_info_failed_sub_2("Regipy can't handle SOFTWARE Hive")
                         #reg_parser.parse_security(hv, self.hiveDirRegipy)
                     if "AMCACHE" in hv_name.upper():
-                        reg_parser.parse_amcache(hv, self.hiveDirRegipy)
+                        reg_parser.parse_amcache_regpy(hv, self.hiveDirRegipy)
                     self.logger_run.print_info_finished_sub_2("parsing {}".format(hv_name))
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [SYTEM HIVE] [REGIPY]")
