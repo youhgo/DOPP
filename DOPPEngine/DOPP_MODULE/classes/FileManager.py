@@ -119,7 +119,7 @@ class FileManager:
                 files.extend(self.recursive_file_search(full_path, reg_ex))
         return files
 
-    def search_and_copy_recurs(self,dir_to_search, destination, reg_ex):
+    def search_and_copy_recurs(self, dir_to_search, destination, reg_ex):
         l_file = self.recursive_file_search(dir_to_search, reg_ex)
         for file in l_file:
             self.copy_file_to_dest(file, destination)

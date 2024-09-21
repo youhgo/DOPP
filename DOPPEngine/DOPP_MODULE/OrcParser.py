@@ -317,13 +317,10 @@ class OrcPaser:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [SRUM]")
-
-            srum_dir = Path(os.path.join(self.extracted_dir, "Artefacts/SRUM/")).absolute()
-
             mngr = FileManager.FileManager()
             srum_paterns = self.artefact_config.get("artefacts", {}).get("files", {}).get("SRUM", "")
             for srum_patern in srum_paterns:
-                l_srum_files = mngr.recursive_file_search(srum_dir, srum_patern)
+                l_srum_files = mngr.recursive_file_search(self.extracted_dir, srum_patern)
                 if l_srum_files:
                     for srum_file in l_srum_files:
                         my_cmd = ["python3", "{}".format(self.ese_analyst_path), "--plugin",
@@ -467,10 +464,10 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[PARSING] [USNJRNL]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
-    def clean_duplicates(self, dir_to_clean):
+    def clean_duplicates_subprocess(self, dir_to_clean):
 
         """
-        To create a Timeline of all the files with Log2Timeline
+        To clean duplicate lines in results files
         :return:
         """
         try:
@@ -482,19 +479,36 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[CLEANING DUPLICATE]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
-    def clean_duplicate_in_file(self, file):
-        """Supprime les doublons d'un fichier en le chargeant entièrement en mémoire.
+    def clean_duplicates(self, dir_to_clean):
 
-        Args:
-            fichier (str): Chemin du fichier.
         """
+        To clean duplicates line in file
+        :return:
+        """
+        try:
+            self.logger_run.print_info_start_sub_1("[CLEANING DUPLICATE]")
+            mngr = FileManager.FileManager()
+            l_file = mngr.list_files_recursive(dir_to_clean)
+            for file in l_file:
+                self.clean_duplicate_in_file(file)
+            self.logger_run.print_info_finished_sub_1("[CLEANING DUPLICATE]")
+        except:
+            self.logger_run.print_info_failed_sub_1("[CLEANING DUPLICATE]")
+            self.logger_debug.print_error_failed(traceback.format_exc())
+
+    def clean_duplicate_in_file(self, file):
+
+        seen_lines = set()
+        l_temp = []
 
         with open(file, 'r') as f:
-            line = set(f)
+            for line in f:
+                if line not in seen_lines:
+                    seen_lines.add(line)
+                    l_temp.append(line)
 
         with open(file, 'w') as f:
-            for line in lies:
-                f.write(line)
+            f.writelines(l_temp)
 
     def convert_epoch_and_sort(self, in_file):
         """Trie un fichier CSV par date décroissante et convertit les timestamps en place.
@@ -686,7 +700,7 @@ class OrcPaser:
             self.parse_usnjrnl()
             self.logger_run.print_info_finished("[MFT]")
 
-        #self.clean_duplicates(self.result_parsed_dir) # Need to be fixed
+        self.clean_duplicates(self.result_parsed_dir) # Need to be fixed
 
         if self.parser_config.get("plaso"):
             self.logger_run.print_info_start("[TIMELINE]")
