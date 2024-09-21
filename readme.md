@@ -7,18 +7,22 @@ To have more info about DOPP:
 * How to use DOPP, tutorial [here](https://youhgo.github.io/DOPP-how-to-use-EN/)
 * DOPP result architecture, explained [here](https://youhgo.github.io/DOPP-Results/)
 
+The [DFIR-ORC](https://github.com/dfir-orc) config file that i use is available [here](./ressources/DFIR-ORC_config.xml)
+
+Setup ORC with my config, tutorial [here]()
 
 ## What is DOPP ?
 
-DOPP for DFIR ORC Parser Project is a python tool use to parse artefact collected by ANSSI [DFIR-ORC](https://github.com/dfir-orc).
+The purpose of DOPP is to provide the necessary tools for parsing Windows artifacts (event logs, MFT, registry hives, amcache, etc.) as part of a digital forensics investigation.
+Dopp produces extremely simple and readable results, allowing analysts to find the information they need directly.
 
-The Goal of DOPP is to provide a solution that can parse evidences in a human readble format.
+Dopp was designed to process archives provided by the [DFIR-ORC](https://github.com/dfir-orc) collection tool from ANSSI but will be compatible with all formats soon.
 
-DOPP is :
-* Fast;
-* Easy to install with Docker;
-* Meant to be installed on a server but run fine on user machine.
+DOPP is:
 
+* Fast: ~5 minutes to process a 500MB archive (excluding PLASO);
+* Easily installable with Docker;
+* Simple to use.
 
 The tool contain a web server with an API for sending archive and consulting the status of processing.
 
