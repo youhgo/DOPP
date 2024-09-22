@@ -15,8 +15,6 @@ from .parsers import (EventParser, ProcessParser, PrefetchParser, NetWorkParser,
 # TODO: Parse browser History
 # TODO: CREATE JSON OUTPUT FOR EVERY PARSER
 # TODO: AD_computer.csv to parse
-# TODO: Clean Duplicates
-# TODO: Parse APPCOMPAT from system hive
 
 class OrcPaser:
     """
