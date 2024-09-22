@@ -41,26 +41,44 @@ DOPP Will :
 * Parse the evidences;
 * Create a Timeline.
 
-All the results are formated in a "human-readable way" : 
+All the results are formated in a "human-readable way".
+Here is an example of the results. We can directly see:
+
+* The use of Mimikatz;
+* The Cobalt Strike beacon;
+* The backdoor;
+* The ransomware;
+* The disabling of the antivirus;
+* The compromised user's connections.
+
 
 ```bash
-4624.csv :
-Date|time|event_code|subject_user_name|target_user_name|ip_address|ip_port|logon_type
-2022-10-27|09:56:01|4624|DESKTOP-9I162HO$|Système|-|-|5
-2022-10-27|09:56:06|4624|DESKTOP-9I162HO$|HRO|192.168.10.102|3389|10
+ rg -i "2021-01-07\|03.(3|4|5)" user_logon_id4624.csv new_service_id7045.csv amcache.csv app_compat_cache.csv powershell.csv windefender.csv 
+windefender.csv
 
-Windefender.csv :
-Date|time|EventCode|ThreatName|Severity|User|ProcessName|Path|Action
-2021-01-07|03:35:44|1116 - Detection|HackTool:Win64/Mikatz!dha|High|BROCELIANDE\arthur|C:\Users\Public\beacon.exe|Not Applicable
-2021-01-07|03:35:46|1116 - Detection|Behavior:Win32/Atosev.D!sms|Severe|-|C:\Users\Public\beacon.exe|Not Applicable
-2021-01-07|03:35:46|1117 - Action|Behavior:Win32/Atosev.D!sms|Severe|-|C:\Users\Public\beacon.exe|Remove
+2021-01-07|03:32:30|1116 - Detection|VirTool:Win32/MSFPsExecCommand|Severe|NT AUTHORITY\SYSTEM|Unknown|CmdLine:_C:\Windows\System32\cmd.exe /Q /c echo cd ^> \\127.0.0.1\C$\__output 2^>^&1 > C:\Windows\TEMP\execute.bat & C:\Windows\system32\cmd.exe /Q /c C:\Windows\TEMP\execute.bat & del C:\Windows\TEMP\execute.bat|Not Applicable
+2021-01-07|03:33:13|1117 - Action|VirTool:Win32/MSFPsExecCommand|Severe|NT AUTHORITY\SYSTEM|Unknown|Remove
+2021-01-07|03:35:44|1116 - Detection|HackTool:Win64/Mikatz!dha|High|BROCELIANDE\arthur|C:\Users\Public\beacon.exe|file:_C:\Users\Public\mimikatz.exe|Not Applicable
 
-App_Compat_cache.csv :
-Date|Time|Name|FullPath|Hash
+app_compat_cache.csv
 2021-01-07|03:39:31|beacon.exe|C:\Users\Public\beacon.exe|e55e5b02ad40e9846a3cd83b00eec225fb98781c6f58a19697bf66a586f77672
 2021-01-07|03:41:21|mimikatz.exe|C:\Users\Public\mimikatz.exe|e55e5b02ad40e9846a3cd83b00eec225fb98781c6f58a19697bf66a586f77672
 2021-01-07|03:56:55|Bytelocker.exe|C:\Users\Public\Bytelocker.exe|e55e5b02ad40e9846a3cd83b00eec225fb98781c6f58a19697bf66a586f77672
-2021-01-07|04:19:41|ActiveDirectorySync.exe|C:\Users\Administrator\Documents\ActiveDirectorySync.exe|e55e5b02ad40e9846a3cd83b00eec225fb98781c6f58a19697bf66a586f77672
+
+powershell.csv
+2021-01-07|03:37:03|600|powershell Set-MpPreference -DisableRealtimeMonitoring $true; Get-MpComputerStatus
+
+new_service_id7045.csv
+2021-01-07|03:32:30|7045|LocalSystem|%COMSPEC% /Q /c echo cd  ^> \\127.0.0.1\C$\__output 2^>^&1 > %TEMP%\execute.bat & %COMSPEC% /Q /c %TEMP%\execute.bat & del %TEMP%\execute.bat|BTOBTO
+
+user_logon_id4624.csv
+2021-01-07|03:30:12|4624|-|GRAAL$|::1|65229|3
+2021-01-07|03:31:26|4624|-|MSOL_0537fce40030|192.168.88.136|54180|3
+2021-01-07|03:31:38|4624|-|arthur|192.168.88.137|54028|3
+2021-01-07|03:32:12|4624|-|GRAAL$|::1|65235|3
+2021-01-07|03:32:30|4624|-|arthur|192.168.88.137|54100|3
+2021-01-07|03:32:45|4624|-|GRAAL$|-|-|3
+2021-01-07|03:32:57|4624|-|arthur|192.168.88.137|54140|3
 ```
 
 
