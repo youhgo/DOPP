@@ -1,0 +1,74 @@
+version: "2"
+
+services:
+  reverse_proxy:
+    image: "traefik:latest"
+    container_name: "DOPP_traefik"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./dependencies/traefik/certs:/etc/certs
+      - ./dependencies/traefik/config.yml:/etc/traefik/config.yml
+      - ./dependencies/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - DoppNet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik=true"
+    depends_on:
+      - redis
+
+  redis:
+    container_name: 'DOPP_redis'
+    image: 'redis:4-alpine'
+    ports:
+      - '6379:6379'
+    expose:
+      - '6379'
+    networks:
+        - DoppNet
+
+  doppApi:
+    build:
+      context: api/
+      dockerfile: docker_files/Dockerfile
+    container_name: "DOPP_api"
+    image: dopp-api
+    networks:
+      - DoppNet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dopp.rule=Host(`DOPP.localhost`)"
+      - "traefik.http.routers.dopp.tls=true"
+      - "traefik.http.services.dopp.loadbalancer.server.port=8880"
+    volumes:
+      - /home/hro/Documents/cyber/working_zone/shared:/python-docker/shared_files/
+
+  doppWorker:
+    image: dopp-worker
+    build:
+      context: ./DOPPEngine
+      dockerfile: DOPP_MODULE/docker_files/Dockerfile
+    container_name: "dopp_worker"
+    command : celery -A tasks worker -l info -E -Q parse
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TOOL_PATH: "/python-docker/DOPP_MODULE/outils"
+
+    volumes:
+      - /home/hro/Documents/cyber/working_zone/shared:/python-docker/shared_files/
+    depends_on:
+      - redis
+    networks:
+      - DoppNet
+
+
+networks:
+    DoppNet:
+
+volumes:
+  shared_files:
+

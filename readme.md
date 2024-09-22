@@ -1,15 +1,12 @@
 # Dfir ORC Parser Project
 
-
 To have more info about DOPP:
 
 * How to install DOPP, tutorial [here](https://youhgo.github.io/DOPP-how-to-install-EN/)
 * How to use DOPP, tutorial [here](https://youhgo.github.io/DOPP-how-to-use-EN/)
 * DOPP result architecture, explained [here](https://youhgo.github.io/DOPP-Results/)
+* How to configure DFIR-ORC tutorial [here](https://youhgo.github.io/DOPP-Config-ORC-EN/)
 
-The [DFIR-ORC](https://github.com/dfir-orc) config file that i use is available [here](./ressources/DFIR-ORC_config.xml)
-
-Setup ORC with my config, tutorial [here]()
 
 ## What is DOPP ?
 
@@ -28,7 +25,8 @@ The tool contain a web server with an API for sending archive and consulting the
 
 There is NO Web or GUI interface to see the results.
 All the results are CSV files formated to be easy to read and to GREP.
-Json output is also possible for SIEM ingestion.
+
+Soon, Json output is will be available for SIEM ingestion.
 
 This architecture is perfect for teamwork because it regroups all the tools and evidences.
 Any analyst can send evidence for processing or access their results as long as they have access to the api for sending
@@ -43,7 +41,7 @@ DOPP Will :
 * Parse the evidences;
 * Create a Timeline.
 
-All the results are formated in a human-readable way : 
+All the results are formated in a "human-readable way" : 
 
 ```bash
 4624.csv :
@@ -75,12 +73,8 @@ Dopp uses externals tools listed here :
 * [ESE-analyst](https://github.com/MarkBaggett/ese-analyst)
 * [analyzeMFT](https://github.com/rowingdude/analyzeMFT)
 * [RegRipper](https://github.com/keydet89/RegRipper3.0)
+* [regpy](https://pypi.org/project/regipy/)
 * [MaximumPlasoParser](https://github.com/Xbloro/maximumPlasoTimelineParser)
-
-## How to ?
-* How to install -> [here](./ressources/documentation/how_to_install.md)
-* How to use -> [here](./ressources/documentation/how_to_use.md)
-
 
 ## How does it work ?
 ![](./ressources/images/DOPP.png)
