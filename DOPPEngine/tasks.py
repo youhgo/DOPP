@@ -10,10 +10,10 @@ SHARED_FOLDER_PATH = "/python-docker/shared_files/"
 DEPOT_FOLDER_PATH = os.path.join(SHARED_FOLDER_PATH, "depot")
 WORKING_FOLDER_PATH = os.path.join(SHARED_FOLDER_PATH, "work")
 LOG_FOLDER_PATH = os.path.join(WORKING_FOLDER_PATH, "execution_logs")
-
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379'),
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
 celery = Celery('tasks', broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
+
 
 
 @celery.task(queue='parse')

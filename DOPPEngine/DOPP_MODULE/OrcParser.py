@@ -57,7 +57,6 @@ class OrcPaser:
 
         self.eventsDir = os.path.join(self.parsed_dir, "events")
         self.eventsJsonDir = os.path.join(self.eventsDir, "events-json")
-        self.eventsParsedDir = os.path.join(self.eventsDir, "events-parsed")
 
         self.processDir = os.path.join(self.parsed_dir, "process")
         self.netWorkDir = os.path.join(self.parsed_dir, "network")
@@ -116,7 +115,6 @@ class OrcPaser:
 
             os.makedirs(self.eventsDir, exist_ok=True)
             os.makedirs(self.eventsJsonDir, exist_ok=True)
-            os.makedirs(self.eventsParsedDir, exist_ok=True)
 
             os.makedirs(self.processDir, exist_ok=True)
             os.makedirs(self.netWorkDir, exist_ok=True)

@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import traceback
-
+import os
 from flask import Blueprint, request, Response, url_for, jsonify
 from worker import celery
 from random import randint
@@ -16,6 +16,9 @@ DEPOT_FOLDER_PATH = os.path.join(SHARED_FOLDER_PATH, "depot")
 WORKING_FOLDER_PATH = os.path.join(SHARED_FOLDER_PATH, "work")
 LOG_FOLDER_PATH = os.path.join(WORKING_FOLDER_PATH, "execution_logs")
 
+os.makedirs(DEPOT_FOLDER_PATH, exist_ok=True)
+os.makedirs(WORKING_FOLDER_PATH, exist_ok=True)
+os.makedirs(LOG_FOLDER_PATH, exist_ok=True)
 
 @parse_api.route('/parse_archive', methods=['POST'])
 def parse_archive():
