@@ -44,7 +44,7 @@ services:
       - "traefik.http.routers.dopp.tls=true"
       - "traefik.http.services.dopp.loadbalancer.server.port=8880"
     volumes:
-      - /please/change/me/shared::/python-docker/shared_files/
+      - /home/hro/Documents/cyber/working_zone/shared:/python-docker/shared_files/
 
   doppWorker:
     image: dopp-worker
@@ -59,7 +59,7 @@ services:
       TOOL_PATH: "/python-docker/DOPP_MODULE/outils"
 
     volumes:
-      - /please/change/me/shared::/python-docker/shared_files/
+      - /home/hro/Documents/cyber/working_zone/shared:/python-docker/shared_files/
     depends_on:
       - redis
     networks:

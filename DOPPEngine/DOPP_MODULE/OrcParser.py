@@ -5,6 +5,7 @@ import sys
 import os
 import traceback
 import csv
+import re
 
 from pathlib import Path
 from .classes import FileManager, Extractor, LoggerManager
@@ -43,6 +44,7 @@ class OrcPaser:
 
         self.path_to_orc = path_to_orc
         self.orc_name = os.path.splitext(os.path.basename(path_to_orc))[0].replace("DFIR-ORC_", "") # pc1
+
 
         self.current_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
         self.orc_final_name = self.orc_name + "_" + self.current_date
@@ -96,6 +98,10 @@ class OrcPaser:
             from .classes.ConfigManager import ConfigManager
             cf_manager = ConfigManager()
             self.artefact_config = cf_manager.load_config("/python-docker/DOPP_MODULE/config/artefact_name_config.json")
+
+    def clean_archive_name(self, pattern, og_name):
+        new_name = re.sub(pattern, '', og_name)
+        return new_name
 
     def initialise_working_directories(self):
         """
@@ -160,7 +166,18 @@ class OrcPaser:
         try:
             self.logger_run.print_info_start_sub_1("[EXTRACTING] archives")
             extr = Extractor.OrcExtractor()
-            extr.extract_orc_archive(self.path_to_orc, self.extracted_dir)
+            cleaned_name_archive = self.clean_archive_name(r'__\d+$', self.path_to_orc)
+            root, filename = os.path.split(cleaned_name_archive)  # /blabla/ - orc1.7z
+            filename_wo_ext, file_ext = os.path.splitext(filename)  # /blabla/orc1
+            self.logger_run.print_info_start_sub_1("{} {} {}".format(filename_wo_ext, file_ext, filename))
+
+            if file_ext == ".7z":
+                self.logger_run.print_info_start_sub_1("Extracting {} ".format(self.path_to_orc))
+                extr.extract_7z_archive(self.path_to_orc, self.extracted_dir)
+            if file_ext == ".zip":
+                self.logger_run.print_info_start_sub_1("Extracting {} ".format(self.path_to_orc))
+                extr.extract_zip_archive(self.path_to_orc, self.extracted_dir)
+
             self.logger_run.print_info_finished_sub_1("[EXTRACTING] archive")
 
         except:
@@ -495,10 +512,13 @@ class OrcPaser:
             self.logger_debug.print_error_failed(traceback.format_exc())
 
     def clean_duplicate_in_file(self, file):
-
+        """
+        Remove duplicated line in file
+        Args:
+        file (str): path to file to be cleaned
+        """
         seen_lines = set()
         l_temp = []
-
         with open(file, 'r') as f:
             for line in f:
                 if line not in seen_lines:

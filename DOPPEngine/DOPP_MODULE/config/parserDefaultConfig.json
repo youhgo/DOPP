@@ -10,6 +10,6 @@
   "parseSystemHivesRegipy" : 1,
   "parseLnk": 1,
   "parseMft" : 1,
-  "plaso" : 1,
-  "mpp": 1
+  "plaso" : 0,
+  "mpp": 0
  }
