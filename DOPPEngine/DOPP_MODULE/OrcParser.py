@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import json
 import subprocess
 import sys
 import os
@@ -306,20 +307,34 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[PARSING] [NETWORK]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
-    # TODO : parse prefetch_1_by_1
     def parse_prefetch(self, is_volume=False, is_json=True):
         """
-        To parse prefetch files to the human readable format Date|Time|ID|ETC
-        :param is_volume: bool
-        :param is_json: bool
+        To parse pf files to the human readable format Date|Time|ID|ETC
         :return:
         """
         try:
+            pf_re = re.compile(r'.*.pf$')
             self.logger_run.print_info_start_sub_1("[PARSING] [PREFETCH]")
+            mngr = FileManager.FileManager()
             pf_parser = PrefetchParser.PrefetchParser()
-            pf_dir = Path(os.path.join(self.extracted_dir, "Artefacts/Prefetch")).absolute()
-            output = pf_parser.parse_dir(pf_dir, is_volume)
-            pf_parser.outputResults(output, os.path.join(self.prefetchDir, "prefetch-parsed.csv"), is_json, is_volume)
+            prefetch_final_file = os.path.join(self.result_parsed_dir, "prefetchs.csv")
+
+            l_pf_files = mngr.recursive_file_search(self.extracted_dir, pf_re)
+            if l_pf_files:
+                for pf_file in l_pf_files:
+                    self.logger_run.print_info_start_sub_2("[PARSING] {}".format(pf_file))
+                    root, pf_file_name = os.path.split(pf_file)
+                    output = pf_parser.parse_file(pf_file, is_volume)
+
+                    if output:
+                        #pf_out_file_csv = os.path.join(self.prefetchDir, "{}.csv".format(pf_file_name))
+                        pf_out_file_json = os.path.join(self.prefetchDir, "{}.json".format(pf_file_name))
+                        pf_parser.outputResults(output, prefetch_final_file)
+                        pf_parser.outputResults(output, pf_out_file_json, True)
+
+            else:
+                self.logger_run.print_info_finished_sub_2("[NO] [PREFETCH] [FOUND]")
+
             self.logger_run.print_info_finished_sub_1("[PARSING] [PREFETCH]")
         except:
             self.logger_run.print_info_failed_sub_1("[PARSING] [PREFETCH]")
@@ -690,11 +705,11 @@ class OrcPaser:
             self.parse_process()
         if self.parser_config.get("ParseNetwork"):
             self.parse_network()
-        if self.parser_config.get("ParsePrefetch"):
-            self.parse_prefetch(False, True)
         if self.parser_config.get("parseLnk"):
             self.parse_lnk()
         self.logger_run.print_info_finished("[FILES]")
+        if self.parser_config.get("ParsePrefetch"):
+            self.parse_prefetch(False, True)
 
         if self.parser_config.get("EvtxToJson"):
             self.logger_run.print_info_start("[EVTX]")

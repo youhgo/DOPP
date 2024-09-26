@@ -106,7 +106,7 @@ class PrefetchParser:
 
         else:
             if output_file:
-                f = open(output_file, 'w')  # opens file for writing (erases contents)
+                f = open(output_file, 'a')  # opens file for writing (erases contents)
                 csv_out = csv.writer(f, delimiter="|")
             else:
                 csv_out = csv.writer(sys.stdout, delimiter="|")
@@ -143,6 +143,7 @@ class PrefetchParser:
                         for j in range(3):
                             row.append(v[4][i][j])
                 csv_out.writerow(row)
+
 
 def parse_args():
     """
