@@ -3,13 +3,14 @@
   "ParseEvtx": 1,
   "ParseProcess": 1,
   "ParseNetwork": 1,
-  "ParsePrefetch" : 1,
-  "ParseSrum" : 1,
+  "ParsePrefetch": 1,
+  "ParseSrum": 1,
   "ParseSystemHivesRr": 1,
   "parseUserHivesRr": 1,
   "parseSystemHivesRegipy" : 1,
   "parseLnk": 1,
   "parseMft": 1,
+  "hayabusa": 1,
   "plaso": 1,
   "mpp": 1
  }

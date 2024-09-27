@@ -7,6 +7,7 @@ import os
 import traceback
 import csv
 import re
+from fileinput import filename
 
 from pathlib import Path
 from .classes import FileManager, Extractor, LoggerManager
@@ -37,6 +38,7 @@ class OrcPaser:
         self.evtx_dump_path = os.path.join(self.tool_path, "evtxdump")
         self.ese_analyst_path = os.path.join(self.tool_path, "ese-analyst/ese2csv.py")
         self.ese_analyst_plugin_path = os.path.join(self.tool_path, "ese-analyst/srudb_plugin.py")
+        self.hayabusa_tool_path = os.path.join(self.tool_path, "hayabusa-2.17.0-linux-intel/hayabusa-2.17.0-lin-x64-gnu")
         self.clean_duplicates_tool_path = os.path.join(self.tool_path, "clean_duplicate.sh")
 
         self.master_id = master_id
@@ -492,6 +494,36 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[PARSING] [USNJRNL]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
+    def launch_hayabusa_subprocess(self):
+        """
+        To parse mft file with analyse mft and parse it to human readble format (|DATE|TIME|ETC|ETC)
+        :return:
+        """
+        try:
+            self.logger_run.print_info_start_sub_1("[HAYABUSA]")
+            mngr = FileManager.FileManager()
+            hayabusa_result_file = os.path.join(self.result_parsed_dir, "hayabusa_timeline.csv")
+            evtx_f_patter = self.artefact_config.get("artefacts", {}).get("event_logs", {}).get("evtx", "")
+            all_evt = []
+            all_evt_dir = []
+            for patern in evtx_f_patter:
+                all_evt = mngr.recursive_file_search(self.extracted_dir, patern)
+            for evt_path in all_evt:
+                root, file_name = os.path.split(evt_path)
+                if root not in all_evt_dir:
+                    all_evt_dir.append(root)
+            if all_evt_dir:
+                for evt_root_dir in all_evt_dir:
+                    my_cmd = ["{}".format(self.hayabusa_tool_path), "csv-timeline", "-d", "{}".format(evt_root_dir),
+                              "-o", "{}".format(hayabusa_result_file), "-w"]
+                    subprocess.run(my_cmd)
+
+            self.logger_run.print_info_finished_sub_1("[HAYABUSA]")
+
+        except:
+            self.logger_run.print_info_failed_sub_1("[HAYABUSA]")
+            self.logger_debug.print_error_failed(traceback.format_exc())
+
     def clean_duplicates_subprocess(self, dir_to_clean):
 
         """
@@ -730,6 +762,11 @@ class OrcPaser:
             self.parse_mft()
             self.parse_usnjrnl()
             self.logger_run.print_info_finished("[MFT]")
+
+        if self.parser_config.get('hayabusa'):
+            self.logger_run.print_info_start("[HAYABUSA]")
+            self.launch_hayabusa_subprocess()
+            self.logger_run.print_info_finished("[HAYABUSA]")
 
         self.clean_duplicates(self.result_parsed_dir) # Need to be fixed
 
