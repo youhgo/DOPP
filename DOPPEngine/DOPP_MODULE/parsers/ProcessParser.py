@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import json
 import os
 import re
 import traceback
@@ -15,13 +16,15 @@ class ProcessParser:
 
     """
 
-    def __init__(self, output_directory, artefact_config="", separator="|") -> None:
+    def __init__(self, output_directory, is_json=False, json_directory="", artefact_config="", separator="|") -> None:
         """
         The constructor for ProcessParser class.
         :param output_directory: str Full path to the directory where the files will be written
         """
         self.separator = separator
         self.dir_out = output_directory
+        self.json_dir_out = json_directory
+        self.is_json = is_json
 
         if not artefact_config:
             self.artefact_config = {
@@ -89,8 +92,10 @@ class ProcessParser:
         :param file_path: path of the Sysinternals output file
         :return:
         """
-        self.autorun_sysinternals_result_file = self.initialise_result_file_csv(self.autorun_header_sysinternals,
+        autorun_sysinternals_result_file_json = open(os.path.join(self.json_dir_out, "autorun_sysinternals.json"), "a")
+        autorun_sysinternals_result_file = self.initialise_result_file_csv(self.autorun_header_sysinternals,
                                                                                 "autorun_sysinternals_parsed")
+
         l_res = []
         reg = re.compile(r'^\d{1,10}\-?')
 
@@ -118,23 +123,35 @@ class ProcessParser:
                                 launch_str = line[11]
                             if line[12]:
                                 md5 = line[12]
-
-                            outLine = "{}{}{}{}{}{}{}{}{}".format(line[0],
+                            if entry == img_path == launch_str == md5 == "-":
+                                continue
+                            out_line = "{}{}{}{}{}{}{}{}{}".format(line[0],
                                                                   self.separator, entry,
                                                                   self.separator, img_path,
                                                                   self.separator, launch_str,
                                                                   self.separator, md5)
-                            l_res.append(outLine)
+                            l_res.append(out_line)
+
+                            if self.is_json:
+                                json_line = {
+                                    "entry": "{}".format(entry),
+                                    "image_path": "{}".format(img_path),
+                                    "launch_string": "{}".format(launch_str),
+                                    "md5": "{}".format(md5),
+                                }
+                                json.dump(json_line, autorun_sysinternals_result_file_json, indent=4)
+
                         except Exception as ex:
                             pass
 
         formated_list = self.format_list_user_friendly(l_res)
         try:
             for line in formated_list:
-                self.autorun_sysinternals_result_file.write(line)
-                self.autorun_sysinternals_result_file.write("\n")
+                autorun_sysinternals_result_file.write(line)
+                autorun_sysinternals_result_file.write("\n")
         except Exception:
             print(traceback.format_exc())
+        autorun_sysinternals_result_file_json.close()
 
     def parse_process1(self, file_path):
         """
@@ -142,7 +159,8 @@ class ProcessParser:
         :param file_path: path of the process1 result file
         :return:
         """
-        self.process1_result_file = self.initialise_result_file_csv(self.process1_header, "process1_parsed")
+        process1_result_file_json = open(os.path.join(self.json_dir_out, "process1.json"), "a")
+        process1_result_file = self.initialise_result_file_csv(self.process1_header, "process1_parsed")
         res = "-"
         with open(file_path, "r") as process:
             for lline in process.readlines()[1:]:  # skip header
@@ -181,8 +199,21 @@ class ProcessParser:
                                                                   self.separator, exe_state,
                                                                   self.separator, proc_id,
                                                                   self.separator, parent_proc_id)
-                    self.process1_result_file.write(res)
-                    self.process1_result_file.write("\n")
+                    process1_result_file.write(res)
+                    process1_result_file.write("\n")
+
+                    if self.is_json:
+                        json_line = {
+                            "process_name":"{}".format(process_name),
+                            "command_line":"{}".format(command_line),
+                            "creation_date":"{}".format(creation_date),
+                            "install_date":"{}".format(install_date),
+                            "exe_path":"{}".format(exe_path),
+                            "exe_state":"{}".format(exe_state),
+                            "proc_id":"{}".format(proc_id),
+                            "parent_proc_id": "{}".format(parent_proc_id)
+                        }
+                        json.dump(json_line, process1_result_file_json, indent=4)
 
     def parse_process2(self, file_path):
         """
@@ -190,7 +221,8 @@ class ProcessParser:
         :param file_path: path of the process2 result file
         :return:
         """
-        self.process2_result_file = self.initialise_result_file_csv(self.process2_header, "process2_parsed")
+        process2_result_file_json = open(os.path.join(self.json_dir_out, "process2.json"), "a")
+        process2_result_file = self.initialise_result_file_csv(self.process2_header, "process2_parsed")
         res = "-"
         with open(file_path, "r") as process:
             for lline in process.readlines()[1:]:  # skip header
@@ -208,8 +240,16 @@ class ProcessParser:
 
                     res = "{}{}{}{}{}".format(process_name, self.separator, proc_path, self.separator, proc_id)
 
-                    self.process2_result_file.write(res)
-                    self.process2_result_file.write("\n")
+                    process2_result_file.write(res)
+                    process2_result_file.write("\n")
+
+                    if self.is_json:
+                        json_line = {
+                            "process_name":"{}".format(process_name),
+                            "proc_path":"{}".format(proc_path),
+                            "proc_id":"{}".format(proc_id)
+                        }
+                        json.dump(json_line, process2_result_file_json, indent=4)
 
     def parse_process_timeline(self, file_path):
         """
@@ -218,7 +258,8 @@ class ProcessParser:
         :return:
         """
         res = "-"
-        self.process_timeline_result_file = self.initialise_result_file_csv(self.process_timeline_header,
+        process_timeline_result_file_json = open(os.path.join(self.json_dir_out, "process_timeline.json"), "a")
+        process_timeline_result_file = self.initialise_result_file_csv(self.process_timeline_header,
                                                                             "process_timeline_parsed")
         with open(file_path, "r") as process_timeline:
             for lline in process_timeline.readlines()[1:]:  # skip header
@@ -249,8 +290,19 @@ class ProcessParser:
                                                           self.separator, proc_id,
                                                           self.separator, full_path)
 
-                    self.process_timeline_result_file.write(res)
-                    self.process_timeline_result_file.write("\n")
+                    process_timeline_result_file.write(res)
+                    process_timeline_result_file.write("\n")
+
+                    if self.is_json:
+                        json_line = {
+                            "date":"{}".format(date),
+                            "time":"{}".format(time),
+                            "type_action":"{}".format(type_action),
+                            "parent_id":"{}".format(parent_id),
+                            "proc_id":"{}".format(proc_id),
+                            "full_path":"{}".format(full_path)
+                        }
+                        json.dump(json_line, process_timeline_result_file_json, indent=4)
 
     def parse_process_infos(self, file_path):
         """
@@ -260,7 +312,8 @@ class ProcessParser:
         """
 
         # ComputerName,FullPath,FileName,Authenticode,Loaded,Registry,Running
-        self.process_info_result_file = self.initialise_result_file_csv(self.process_info_header,
+        process_info_result_file_json = open(os.path.join(self.json_dir_out, "process_info.json"), "a")
+        process_info_result_file = self.initialise_result_file_csv(self.process_info_header,
                                                                         "process_info_parsed")
         res = "-"
         with open(file_path, "r") as process_timeline:
@@ -293,8 +346,19 @@ class ProcessParser:
                                                           self.separator, loaded,
                                                           self.separator, full_path)
 
-                    self.process_info_result_file.write(res)
-                    self.process_info_result_file.write("\n")
+                    process_info_result_file.write(res)
+                    process_info_result_file.write("\n")
+
+                    if self.is_json:
+                        json_line = {
+                            "file_name":"{}".format(file_name),
+                            "running":"{}".format(running),
+                            "registry": "{}".format(registry),
+                            "authenticode":"{}".format(authenticode),
+                            "loaded":"{}".format(loaded),
+                            "full_path":"{}".format(full_path)
+                        }
+                        json.dump(json_line, process_info_result_file_json, indent=4)
 
     def parse_process_autoruns(self, file_path):
         """
@@ -302,8 +366,8 @@ class ProcessParser:
         :param file_path: path of the GetSample_autoruns result file
         :return:
         """
-
-        self.process_autoruns_result_file = self.initialise_result_file_csv(self.process_autoruns_header,
+        process_autoruns_result_file_json = open(os.path.join(self.json_dir_out, "process_autoruns.json"), "a")
+        process_autoruns_result_file = self.initialise_result_file_csv(self.process_autoruns_header,
                                                                             "process_autoruns_parsed")
         l_res = []
         res = "-"
@@ -332,11 +396,21 @@ class ProcessParser:
                                                               self.separator, enabled,
                                                               self.separator, path)
                         l_res.append(res)
+                        if self.is_json:
+                            json_line = {
+                                "date": "{}".format(date),
+                                "time": "{}".format(time),
+                                "name": "{}".format(name),
+                                "launchstr": "{}".format(launchstr),
+                                "enabled": "{}".format(enabled)
+                            }
+                            json.dump(json_line, process_autoruns_result_file_json, indent=4)
+
         formated_list = self.format_list_user_friendly(l_res)
         try:
             for line in formated_list:
-                self.process_autoruns_result_file.write(line)
-                self.process_autoruns_result_file.write("\n")
+                process_autoruns_result_file.write(line)
+                process_autoruns_result_file.write("\n")
         except Exception:
             print(traceback.format_exc())
 

@@ -1,7 +1,7 @@
 {
   "EvtxToJson": 1,
   "ParseEvtx": 1,
-  "ParseProcess": 0,
+  "ParseProcess": 1,
   "ParseNetwork": 0,
   "ParsePrefetch": 0,
   "ParseSrum": 0,

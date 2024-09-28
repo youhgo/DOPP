@@ -318,7 +318,7 @@ class OrcPaser:
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [PROCESSES]")
 
-            proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir)
+            proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir, True, self.json_dir)
             proc_parser.parse_all(self.processDir)
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [PROCESSES]")
@@ -762,7 +762,6 @@ class OrcPaser:
 
         self.logger_run.print_info_start("[FILES]")
         self.clean()
-
         self.move_txt_artefacts()
         self.parse_system_info()
 

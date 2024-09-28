@@ -545,7 +545,6 @@ class EventParser:
                                               img_path, self.separator,
                                               service_name, self.separator,
                                               start_type)
-        print(res)
 
         self.service_file_csv.write(res)
         self.service_file_csv.write('\n')
