@@ -2,7 +2,7 @@
   "EvtxToJson": 1,
   "ParseEvtx": 1,
   "ParseProcess": 1,
-  "ParseNetwork": 0,
+  "ParseNetwork": 1,
   "ParsePrefetch": 0,
   "ParseSrum": 0,
   "ParseSystemHivesRr": 0,

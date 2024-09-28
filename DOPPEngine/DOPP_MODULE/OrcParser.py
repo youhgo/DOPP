@@ -57,6 +57,8 @@ class OrcPaser:
         self.extracted_dir = os.path.join(self.orc_folder, "extracted")
         self.parsed_dir = os.path.join(self.orc_folder, "parsed")
 
+        self.evt_dir = os.path.join(self.parsed_dir, "event")
+
         self.processDir = os.path.join(self.parsed_dir, "process")
         self.netWorkDir = os.path.join(self.parsed_dir, "network")
         self.powershellDir = os.path.join(self.parsed_dir, "powershell")
@@ -112,6 +114,7 @@ class OrcPaser:
             os.makedirs(self.extracted_dir, exist_ok=True)
             os.makedirs(self.parsed_dir, exist_ok=True)
 
+            os.makedirs(self.evt_dir, exist_ok=True)
             os.makedirs(self.processDir, exist_ok=True)
             os.makedirs(self.netWorkDir, exist_ok=True)
             os.makedirs(self.powershellDir, exist_ok=True)
@@ -279,7 +282,7 @@ class OrcPaser:
                             evt_json_name = evt_name_wo_ext + ".json"
                             self.logger_run.print_info_start_sub_2("Converting {} to json".format(evt_name_wo_ext))
 
-                            out_file = os.path.join(self.json_dir, evt_json_name)
+                            out_file = os.path.join(self.evt_dir, evt_json_name)
                             my_cmd = ["{}".format(self.evtx_dump_path), "{}".format(evt)]
                             with open(out_file, "w") as outfile:
                                 subprocess.run(my_cmd, stdout=outfile)
@@ -303,7 +306,7 @@ class OrcPaser:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [EVTX]")
-            evtparser = EventParser.EventParser(self.json_dir, self.result_parsed_dir)
+            evtparser = EventParser.EventParser(self.evt_dir, self.result_parsed_dir)
             evtparser.parse_all()
             self.logger_run.print_info_finished_sub_1("[PARSING] [EVTX]")
         except:
@@ -318,7 +321,7 @@ class OrcPaser:
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [PROCESSES]")
 
-            proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir, True, self.json_dir)
+            proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir, True, self.processDir)
             proc_parser.parse_all(self.processDir)
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [PROCESSES]")
