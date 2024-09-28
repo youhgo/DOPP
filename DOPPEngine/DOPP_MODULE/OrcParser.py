@@ -236,7 +236,7 @@ class OrcPaser:
                 if l_file:
                     for file in l_file:
                         out_txt_file_path = os.path.join(self.parsed_dir, "systeminfo.txt")
-                        out_json_file_path = os.path.join(self.json_dir, "systeminfo.json")
+                        out_json_file_path = os.path.join(self.parsed_dir, "systeminfo.json")
                         out_txt_file_stream = open(out_txt_file_path, 'a')
                         out_json_file_stream = open(out_json_file_path, 'a')
 
