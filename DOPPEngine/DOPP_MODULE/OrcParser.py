@@ -35,7 +35,7 @@ class OrcPaser:
         """
         self.tool_path = os.environ.get("TOOL_PATH", "python-docker/DOPP_MODULE/outils")
         self.evtx_dump_path_old = os.path.join(self.tool_path, "evtx_dump")
-        self.evtx_dump_path = os.path.join(self.tool_path, "evtxdump")
+        self.evtx_dump_path = os.path.join(self.tool_path, "evtx_dump")
         self.ese_analyst_path = os.path.join(self.tool_path, "ese-analyst/ese2csv.py")
         self.ese_analyst_plugin_path = os.path.join(self.tool_path, "ese-analyst/srudb_plugin.py")
         self.hayabusa_tool_path = os.path.join(self.tool_path, "hayabusa-2.17.0-linux-intel/hayabusa-2.17.0-lin-x64-gnu")
@@ -57,9 +57,6 @@ class OrcPaser:
         self.extracted_dir = os.path.join(self.orc_folder, "extracted")
         self.parsed_dir = os.path.join(self.orc_folder, "parsed")
 
-        self.eventsDir = os.path.join(self.parsed_dir, "events")
-        self.eventsJsonDir = os.path.join(self.eventsDir, "events-json")
-
         self.processDir = os.path.join(self.parsed_dir, "process")
         self.netWorkDir = os.path.join(self.parsed_dir, "network")
         self.powershellDir = os.path.join(self.parsed_dir, "powershell")
@@ -80,7 +77,7 @@ class OrcPaser:
         self.lnkDir = os.path.join(self.parsed_dir, "lnk")
 
         self.result_parsed_dir = os.path.join(self.parsed_dir, "parsed_for_human")
-
+        self.json_dir = os.path.join(self.parsed_dir, "json_results")
         self.logger_run = ""
         self.logger_debug = ""
 
@@ -115,9 +112,6 @@ class OrcPaser:
             os.makedirs(self.extracted_dir, exist_ok=True)
             os.makedirs(self.parsed_dir, exist_ok=True)
 
-            os.makedirs(self.eventsDir, exist_ok=True)
-            os.makedirs(self.eventsJsonDir, exist_ok=True)
-
             os.makedirs(self.processDir, exist_ok=True)
             os.makedirs(self.netWorkDir, exist_ok=True)
             os.makedirs(self.powershellDir, exist_ok=True)
@@ -136,6 +130,7 @@ class OrcPaser:
             os.makedirs(self.txtLogDir, exist_ok=True)
             os.makedirs(self.lnkDir, exist_ok=True)
             os.makedirs(self.result_parsed_dir, exist_ok=True)
+            os.makedirs(self.json_dir, exist_ok=True)
 
             self.logger_run = LoggerManager.LoggerManager("running", self.running_log_file_path, "INFO")
             self.logger_debug = LoggerManager.LoggerManager("debug", self.debug_log_file_path, "DEBUG")
@@ -208,7 +203,7 @@ class OrcPaser:
             self.logger_run.print_info_start_sub_1("[MOVING] txt artefacts")
 
             self.search_and_copy_artefacts_from_config("orc", self.debugDir)
-            self.search_and_copy_artefacts_from_config("system", self.parsed_dir)
+            #self.search_and_copy_artefacts_from_config("system", self.parsed_dir)
             self.search_and_copy_artefacts_from_config("network", self.netWorkDir)
             self.search_and_copy_artefacts_from_config("process", self.processDir)
             self.search_and_copy_artefacts_from_config("powershell", self.powershellDir)
@@ -226,6 +221,42 @@ class OrcPaser:
 
         except:
             self.logger_run.print_info_failed_sub_1("[MOVING] txt artefacts")
+            self.logger_debug.print_error_failed(traceback.format_exc())
+
+    def parse_system_info(self):
+        self.logger_run.print_info_start_sub_1("[PARSING] [SYSTEMINFO]")
+        try:
+            mngr = FileManager.FileManager()
+            all_file_to_search = self.artefact_config.get("artefacts", {}).get("system", {}).get("system_info", "")
+            for f_patern in all_file_to_search:
+                l_file = mngr.recursive_file_search(self.extracted_dir, f_patern)
+                if l_file:
+                    for file in l_file:
+                        out_txt_file_path = os.path.join(self.parsed_dir, "systeminfo.txt")
+                        out_json_file_path = os.path.join(self.json_dir, "systeminfo.json")
+                        out_txt_file_stream = open(out_txt_file_path, 'a')
+                        out_json_file_stream = open(out_json_file_path, 'a')
+
+                        with open(file, 'r') as system_info_file:
+                            reader = csv.reader(system_info_file)
+                            header = next(reader)
+                            data = []
+                            for line in reader:
+                                line_dict = dict(zip(header, line))
+                                data.append(line_dict)
+                                for i, value in enumerate(line):
+                                    out_txt_file_stream.write("{}:{}".format(header[i], value))
+                                    out_txt_file_stream.write("\n")
+
+                            json.dump(data, out_json_file_stream, indent=4)
+                            out_txt_file_stream.close()
+                            out_json_file_stream.close()
+                            self.logger_run.print_info_finished_sub_1("[CONVERTING] [EVTX] [JSON]")
+                else:
+                    self.logger_run.print_info_failed_sub_1("SYSTEMINFO FILE NOT FOUND")
+
+        except:
+            self.logger_run.print_info_failed_sub_1("[PARSING] [SYSTEMINFO]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
     def convert_evtx_to_json(self):
@@ -248,15 +279,17 @@ class OrcPaser:
                             evt_json_name = evt_name_wo_ext + ".json"
                             self.logger_run.print_info_start_sub_2("Converting {} to json".format(evt_name_wo_ext))
 
-                            out_file = os.path.join(self.eventsJsonDir, evt_json_name)
+                            out_file = os.path.join(self.json_dir, evt_json_name)
                             my_cmd = ["{}".format(self.evtx_dump_path), "{}".format(evt)]
                             with open(out_file, "w") as outfile:
                                 subprocess.run(my_cmd, stdout=outfile)
 
                             self.logger_run.print_info_finished_sub_2("Converting {} to json".format(evt_name_wo_ext))
 
+
                         except:
                             self.logger_run.print_info_failed_sub_2("Converting {} to json".format(evt_name))
+                            self.logger_debug.print_error_failed(traceback.format_exc())
 
             self.logger_run.print_info_finished_sub_1("[CONVERTING] [EVTX] [JSON]")
         except:
@@ -270,7 +303,7 @@ class OrcPaser:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [EVTX]")
-            evtparser = EventParser.EventParser(self.eventsJsonDir, self.result_parsed_dir)
+            evtparser = EventParser.EventParser(self.json_dir, self.result_parsed_dir)
             evtparser.parse_all()
             self.logger_run.print_info_finished_sub_1("[PARSING] [EVTX]")
         except:
@@ -585,9 +618,9 @@ class OrcPaser:
             reader = csv.reader(file, delimiter='|')
             lines = list(reader)
 
-            def cle_tri(ligne):
+            def cle_tri(line):
                 try:
-                    timestamp = int(ligne[0])
+                    timestamp = int(line[0])
                     return datetime.datetime.fromtimestamp(timestamp)
                 except:
                     return datetime.datetime.now()
@@ -731,6 +764,8 @@ class OrcPaser:
         self.clean()
 
         self.move_txt_artefacts()
+        self.parse_system_info()
+
         if self.parser_config.get("ParseProcess"):
             self.parse_process()
         if self.parser_config.get("ParseNetwork"):
@@ -738,6 +773,7 @@ class OrcPaser:
         if self.parser_config.get("parseLnk"):
             self.parse_lnk()
         self.logger_run.print_info_finished("[FILES]")
+
         if self.parser_config.get("ParsePrefetch"):
             self.parse_prefetch(False, True)
 
