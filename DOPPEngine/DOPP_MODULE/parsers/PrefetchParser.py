@@ -103,7 +103,6 @@ class PrefetchParser:
                         json.dump(json_output, file)
                 else:
                     print(json.dumps(json_output, indent=4, sort_keys=True))
-
         else:
             if output_file:
                 f = open(output_file, 'a')  # opens file for writing (erases contents)

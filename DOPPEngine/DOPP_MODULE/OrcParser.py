@@ -7,7 +7,6 @@ import os
 import traceback
 import csv
 import re
-from fileinput import filename
 
 from pathlib import Path
 from .classes import FileManager, Extractor, LoggerManager
@@ -16,7 +15,7 @@ from .parsers import (EventParser, ProcessParser, PrefetchParser, NetWorkParser,
 
 # TODO: Replay all hives transactions
 # TODO: Parse browser History
-# TODO: CREATE JSON OUTPUT FOR EVERY PARSER
+# TODO: CREATE JSON OUTPUT FOR EVERY PARSER - Ongoing
 # TODO: AD_computer.csv to parse
 
 class OrcPaser:
@@ -24,14 +23,17 @@ class OrcPaser:
     Main class to launch all tools
     """
 
-    def __init__(self, path_to_orc, path_to_work_dir, case_name, master_id="", parser_config="", artefact_config="") -> None:
+    def __init__(self, path_to_orc, path_to_work_dir, case_name, machine_name="",
+                 master_id="", parser_config="", artefact_config="") -> None:
         """
         Constructer for Orc Parser class
         :param path_to_orc: str : path to archive
         :param path_to_work_dir: str : path to working directory (where all processed file will be written)
         :param case_name: str: name of the case
+        :param machine_name: str: name of the machine
         :param master_id: celery process id
-        :param config: json/dict parsers config
+        :param parser_config: json/dict parsers config
+        :param artefact_config: json/dict artefact config
         """
         self.tool_path = os.environ.get("TOOL_PATH", "python-docker/DOPP_MODULE/outils")
         self.evtx_dump_path_old = os.path.join(self.tool_path, "evtx_dump")
@@ -44,18 +46,17 @@ class OrcPaser:
         self.master_id = master_id
 
         self.case_name = case_name
+        self.machine_name = machine_name
 
         self.path_to_orc = path_to_orc
-        self.orc_name = os.path.splitext(os.path.basename(path_to_orc))[0].replace("DFIR-ORC_", "") # pc1
-
 
         self.current_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
-        self.orc_final_name = self.orc_name + "_" + self.current_date
+        self.machine_working_folder_name = self.machine_name + "_" + self.current_date
 
         self.work_dir = os.path.join(path_to_work_dir, case_name)
-        self.orc_folder = os.path.join(self.work_dir, self.orc_final_name)
-        self.extracted_dir = os.path.join(self.orc_folder, "extracted")
-        self.parsed_dir = os.path.join(self.orc_folder, "parsed")
+        self.machine_working_folder_path = os.path.join(self.work_dir, self.machine_working_folder_name)
+        self.extracted_dir = os.path.join(self.machine_working_folder_path, "extracted_raw")
+        self.parsed_dir = os.path.join(self.machine_working_folder_path, "parsed")
 
         self.evt_dir = os.path.join(self.parsed_dir, "event")
 
@@ -110,7 +111,7 @@ class OrcPaser:
         """
         try:
             os.makedirs(self.work_dir, exist_ok=True)
-            os.makedirs(self.orc_folder, exist_ok=True)
+            os.makedirs(self.machine_working_folder_path, exist_ok=True)
             os.makedirs(self.extracted_dir, exist_ok=True)
             os.makedirs(self.parsed_dir, exist_ok=True)
 
