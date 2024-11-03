@@ -47,6 +47,7 @@ class OrcPaser:
 
         self.case_name = case_name
         self.machine_name = machine_name
+        self.host_name = ""
 
         self.path_to_orc = path_to_orc
 
@@ -255,7 +256,7 @@ class OrcPaser:
                             json.dump(data, out_json_file_stream, indent=4)
                             out_txt_file_stream.close()
                             out_json_file_stream.close()
-                            self.logger_run.print_info_finished_sub_1("[CONVERTING] [EVTX] [JSON]")
+                            self.logger_run.print_info_finished_sub_1("[PARSING] [SYSTEMINFO]")
                 else:
                     self.logger_run.print_info_failed_sub_1("SYSTEMINFO FILE NOT FOUND")
 
@@ -443,7 +444,7 @@ class OrcPaser:
         :return:
         """
         try:
-            self.logger_run.print_info_start_sub_1("[PARSING] [SYTEM HIVE] [REGIPY]")
+            self.logger_run.print_info_start_sub_1("[PARSING] [SYSTEM HIVE] [REGIPY]")
             reg_parser = RegistryParser.RegistryParser()
             mngr = FileManager.FileManager()
 
@@ -710,7 +711,7 @@ class OrcPaser:
                 "|",
                 self.case_name,
                 None,
-                None)
+                self.machine_name)
 
             mp.parse_timeline(os.path.join(self.timelineDir, "timeline.json"))
             self.logger_run.print_info_finished_sub_1("[Maximum Plaso Parser]")
@@ -753,6 +754,25 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[PARSING] [LNK]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
+    def get_host_name(self):
+        host_name = ""
+        if os.path.isfile(os.path.join(self.parsed_dir, "systeminfo.json")):
+            with open(os.path.join(self.parsed_dir, "systeminfo.json"), "r") as  system_info_file:
+                info = json.load(system_info_file)
+                if type(info) == list:
+                    if info[0].get("Host Name"):
+                        host_name =  info[0].get("Host Name")
+                if type(info) == dict:
+                    if info.get("Host Name"):
+                        host_name = info.get("Host Name")
+        else:
+            host_name = self.machine_name
+
+        return host_name
+
+
+        pass
+
     def work(self):
         """
         To launch all parsers
@@ -768,6 +788,7 @@ class OrcPaser:
         self.clean()
         self.move_txt_artefacts()
         self.parse_system_info()
+        self.host_name = self.get_host_name()
 
         if self.parser_config.get("ParseProcess"):
             self.parse_process()
