@@ -6,7 +6,7 @@ import traceback
 import argparse
 from pathlib import Path
 import xmltodict
-
+import sys
 
 
 class ProcessParser:
@@ -436,6 +436,7 @@ class ProcessParser:
                 self.parse_autoruns_sysinternals(autorun_file)
 
         process1_files = self.recursive_file_search(input_dir, self.artefact_config.get("process1", ""))
+
         if process1_files:
             for process1_file in process1_files:
                 self.parse_process1(process1_file)

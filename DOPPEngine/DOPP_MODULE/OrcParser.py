@@ -327,7 +327,7 @@ class OrcPaser:
                                                       self.machine_name,
                                                       True,
                                                       self.processDir)
-            proc_parser.parse_all(self.processDir)
+            proc_parser.parse_all(self.extracted_dir)
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [PROCESSES]")
         except:
