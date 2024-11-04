@@ -52,7 +52,7 @@ class LnkParser:
                 lnk = LnkParse3.lnk_file(file_in)
                 res = lnk.get_json()
             if res:
-                self.parse_lnk_json_to_csv(res)
+                self.parse_lnk_json_to_csv(res, lnk_name)
                 with open(path_out_json, "a") as outfile:
                     json.dump(res, outfile, default=str)
 
@@ -65,7 +65,7 @@ class LnkParser:
             if item.endswith(".lnk"):
                 self.parse_lnk_to_json(os.path.join(input_dir, item), dir_out)
 
-    def parse_lnk_json_to_csv(self, lnk_as_json):
+    def parse_lnk_json_to_csv(self, lnk_as_json, file_name):
         """
         To parse json file to human-readble file |DATE|TIME|ETC|ETC
         :param lnk_as_json: dict containing the lnk info
@@ -81,10 +81,11 @@ class LnkParser:
         if not local_path:
             local_path = lnk_as_json.get("data",{}).get("description","-")
 
-        res = "{}{}{}{}{}{}{}".format(creation_time,
-                                      self.separator, accessed_time,
-                                      self.separator, modified_time,
-                                      self.separator, local_path)
+        res = "{}{}{}{}{}{}{}{}{}".format(creation_time,
+                                          self.separator, accessed_time,
+                                          self.separator, modified_time,
+                                          self.separator, local_path,
+                                          self.separator, file_name)
         self.lnk_result_file.write(res)
         self.lnk_result_file.write("\n")
 
