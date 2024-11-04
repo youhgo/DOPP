@@ -2,19 +2,31 @@
 import os
 import traceback
 import argparse
+import json
 
 class DiskParser:
     """
     Class to parse Disk info related artefacts
     """
 
-    def __init__(self, output_directory="") -> None:
+    def __init__(self, output_directory,  machine_name="-", is_json=False, json_directory="", separator="|") -> None:
         """
-        The constructor for DiskParser class.
-        :param output_directory: str Full path to the directory where the files will be written
+        The constructor for DiskParser class
+        :param output_directory: str : path to where csv results will be written
+        :param is_json: Bool : set yes to add a json output file
+        :param machine_name: str: name of the machine
+        :param json_directory: str: path to where json results will be written
+        :param artefact_config: dict: artefact config
+        :param separator: str: csv separator default is pipe
         """
-        self.separator = "|"
+        self.separator = separator
         self.dir_out = output_directory
+        if json_directory:
+            self.json_dir_out = json_directory
+        else:
+            self.json_dir_out = output_directory
+        self.is_json = is_json
+        self.machine_name = machine_name
 
         self.usn_header = ["Date", "Time", "FileName", "Reason", "FilePath"]
         self.mft_header = ["CreationDate", "ModificationDate", "AccessDate", "EntryDate", "FilePath"]
@@ -42,6 +54,8 @@ class DiskParser:
         """
 
         self.usnjrnl_result_file = self.initialise_result_file_csv(self.usn_header, "usnjrnl_parsed")
+        if self.is_json:
+            usnjrnl_result_file_json = open(os.path.join(self.json_dir_out, "usnjrl_parsed.json"), "a")
         try:
             res = ""
             with open(file_path, 'r') as usnjrnl:
@@ -59,6 +73,17 @@ class DiskParser:
                                                       self.separator, file_path)
                     self.usnjrnl_result_file.write(res)
                     self.usnjrnl_result_file.write("\n")
+
+                    if self.is_json:
+                        json_line = {
+                            "machine_name": "{}".format(self.machine_name),
+                            "date_time": "{} {}".format(date, time),
+                            "reason": "{}".format(reason),
+                            "file_name": "{}".format(file_name),
+                            "file_path": "{}".format(file_path),
+                        }
+                        json.dump(json_line, usnjrnl_result_file_json, indent=4)
+
         except Exception:
             print(traceback.format_exc())
 
@@ -70,6 +95,8 @@ class DiskParser:
         """
 
         self.mft_result_file = self.initialise_result_file_csv(self.mft_header, "mft_parsed")
+        if self.is_json:
+            mft_result_file_json = open(os.path.join(self.json_dir_out, "mft_parsed.json"), "a")
         try:
             res = ""
             with open(file_path, 'r') as mft:
@@ -91,6 +118,18 @@ class DiskParser:
                             )
                             self.mft_result_file.write(res)
                             self.mft_result_file.write("\n")
+
+                            if self.is_json:
+                                json_line = {
+                                    "machine_name": "{}".format(self.machine_name),
+                                    "std_date_creation": "{}".format(std_date_creation),
+                                    "std_date_modification": "{}".format(std_date_modification),
+                                    "std_date_access": "{}".format(std_date_access),
+                                    "std_date_entry": "{}".format(std_date_entry),
+                                    "file_name": "{}".format(file_name)
+                                }
+                                json.dump(json_line, mft_result_file_json, indent=4)
+
                         except:
                             continue
         except Exception:

@@ -508,7 +508,8 @@ class OrcPaser:
                         my_cmd = ["analyze_mft", "-f", "{}".format(mft_file),
                                   "-o", "{}".format(mft_result_file)]
                         subprocess.run(my_cmd)
-                        mft_parser = DiskParser.DiskParser(self.result_parsed_dir)
+                        mft_parser = DiskParser.DiskParser(self.result_parsed_dir, self.machine_name, True,
+                                                           self.mftDir)
                         mft_parser.parse_mft(mft_result_file)
                 self.logger_run.print_info_finished_sub_1("[PARSING] [MFT]")
             else:
@@ -529,7 +530,8 @@ class OrcPaser:
             for usn_patern in usn_paterns:
                 usn_files = mngr.recursive_file_search(self.extracted_dir, usn_patern)
                 for usn_file in usn_files:
-                    usn_parser = DiskParser.DiskParser(self.result_parsed_dir)
+                    usn_parser = DiskParser.DiskParser(self.result_parsed_dir, self.machine_name, True,
+                                                       self.mftDir)
                     usn_parser.parse_usnjrnl(usn_file)
             self.logger_run.print_info_finished_sub_1("[PARSING] [USNJRNL]")
         except:
