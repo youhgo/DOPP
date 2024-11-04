@@ -171,21 +171,22 @@ class RegistryParser:
         if search:
             relative_file_path = Path(os.path.join(dir_to_reg, search[0]))
             absolute_file_path = relative_file_path.absolute()  # absolute is a Path object
-            reg_parser.parse_amcache_regpy(absolute_file_path, out_folder)
+
+            self.parse_amcache_regpy(absolute_file_path, out_folder)
 
         search = [f for f in os.listdir(dir_to_reg) if
                   re.search(r'SECURITY', f)]
         if search:
             relative_file_path = Path(os.path.join(dir_to_reg, search[0]))
             absolute_file_path = relative_file_path.absolute()  # absolute is a Path object
-            reg_parser.parse_security_regpy(absolute_file_path, out_folder)
+            self.parse_security_regpy(absolute_file_path, out_folder)
 
         search = [f for f in os.listdir(dir_to_reg) if
                   re.search(r'SYSTEM', f)]
         if search:
             relative_file_path = Path(os.path.join(dir_to_reg, search[0]))
             absolute_file_path = relative_file_path.absolute()  # absolute is a Path object
-            reg_parser.parse_system(absolute_file_path, out_folder)
+            self.parse_system(absolute_file_path, out_folder)
         '''
 
 
