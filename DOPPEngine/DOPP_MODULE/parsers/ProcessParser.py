@@ -6,7 +6,7 @@ import traceback
 import argparse
 from pathlib import Path
 import xmltodict
-from systemd.login import machine_names
+
 
 
 class ProcessParser:
@@ -17,7 +17,7 @@ class ProcessParser:
 
     """
 
-    def __init__(self, output_directory, is_json=False, machine_name="", json_directory="",
+    def __init__(self, output_directory,  machine_name="-", is_json=False, json_directory="",
                  artefact_config="", separator="|") -> None:
         """
         The constructor for ProcessParser class
@@ -30,14 +30,17 @@ class ProcessParser:
         """
         self.separator = separator
         self.dir_out = output_directory
-        self.json_dir_out = json_directory
+        if json_directory:
+            self.json_dir_out = json_directory
+        else:
+            self.json_dir_out = output_directory
         self.is_json = is_json
         self.machine_name = machine_name
 
         if not artefact_config:
             self.artefact_config = {
-                "process1": "process1.csv",
-                "process2": "process2.csv",
+                "process1": "processes1.csv",
+                "process2": "processes2.csv",
                 "autoruns": "autoruns.csv",
                 "sample_autoruns": ["GetSamples_autoruns.xml", "Process_Autoruns.xml"],
                 "sample_timeline": ["GetSamples_timeline.csv", "Process_timeline.csv"],

@@ -324,8 +324,8 @@ class OrcPaser:
             self.logger_run.print_info_start_sub_1("[PARSING] [PROCESSES]")
 
             proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir,
-                                                      True,
                                                       self.machine_name,
+                                                      True,
                                                       self.processDir)
             proc_parser.parse_all(self.processDir)
 
@@ -341,8 +341,9 @@ class OrcPaser:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [NETWORK]")
-            nt_parser = NetWorkParser.NetWorkParser()
-            nt_parser.parse_all(self.extracted_dir, self.result_parsed_dir)
+            nt_parser = NetWorkParser.NetWorkParser(self.result_parsed_dir, self.machine_name, True,
+                                                    self.netWorkDir)
+            nt_parser.parse_all(self.extracted_dir)
             self.logger_run.print_info_finished_sub_1("[PARSING] [NETWORK]")
         except:
             self.logger_run.print_info_failed_sub_1("[PARSING] [NETWORK]")
