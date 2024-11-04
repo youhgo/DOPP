@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import logging as log
 import os
 import traceback
 import argparse
@@ -21,7 +20,7 @@ class LnkParser:
         self.separator = "|"
         self.dir_out = output_directory
 
-        self.lnk_header = ["CreationTime", "AccessTime", "ModifiedTime", "Target/Path/Description"]
+        self.lnk_header = ["CreationTime", "AccessTime", "ModifiedTime", "Target/Path/Description", "lnkName"]
         self.lnk_result_file = self.initialise_result_file_csv(self.lnk_header, "lnk_parsed")
 
     def initialise_result_file_csv(self, header, file_name, extension="csv"):
