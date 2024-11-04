@@ -26,7 +26,7 @@ class OrcPaser:
     def __init__(self, path_to_orc, path_to_work_dir, case_name, machine_name="",
                  master_id="", parser_config="", artefact_config="") -> None:
         """
-        Constructer for Orc Parser class
+        Constructor for Orc Parser class
         :param path_to_orc: str : path to archive
         :param path_to_work_dir: str : path to working directory (where all processed file will be written)
         :param case_name: str: name of the case
@@ -317,13 +317,16 @@ class OrcPaser:
 
     def parse_process(self):
         """
-        To parse processes results files to the human readable format Date|Time|ID|ETC
+        To parse processes results files to the human-readable format Date|Time|ID|ETC
         :return:
         """
         try:
             self.logger_run.print_info_start_sub_1("[PARSING] [PROCESSES]")
 
-            proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir, True, self.processDir)
+            proc_parser = ProcessParser.ProcessParser(self.result_parsed_dir,
+                                                      True,
+                                                      self.machine_name,
+                                                      self.processDir)
             proc_parser.parse_all(self.processDir)
 
             self.logger_run.print_info_finished_sub_1("[PARSING] [PROCESSES]")

@@ -6,6 +6,7 @@ import traceback
 import argparse
 from pathlib import Path
 import xmltodict
+from systemd.login import machine_names
 
 
 class ProcessParser:
@@ -16,15 +17,22 @@ class ProcessParser:
 
     """
 
-    def __init__(self, output_directory, is_json=False, json_directory="", artefact_config="", separator="|") -> None:
+    def __init__(self, output_directory, is_json=False, machine_name="", json_directory="",
+                 artefact_config="", separator="|") -> None:
         """
-        The constructor for ProcessParser class.
-        :param output_directory: str Full path to the directory where the files will be written
+        The constructor for ProcessParser class
+        :param output_directory: str : path to where csv results will be written
+        :param is_json: Bool : set yes to add a json output file
+        :param machine_name: str: name of the machine
+        :param json_directory: str: path to where json results will be written
+        :param artefact_config: dict: artefact config
+        :param separator: str: csv separator default is pipe
         """
         self.separator = separator
         self.dir_out = output_directory
         self.json_dir_out = json_directory
         self.is_json = is_json
+        self.machine_name = machine_name
 
         if not artefact_config:
             self.artefact_config = {
@@ -134,6 +142,7 @@ class ProcessParser:
 
                             if self.is_json:
                                 json_line = {
+                                    "machine_name": "{}".format(self.machine_name),
                                     "entry": "{}".format(entry),
                                     "image_path": "{}".format(img_path),
                                     "launch_string": "{}".format(launch_str),
@@ -204,6 +213,7 @@ class ProcessParser:
 
                     if self.is_json:
                         json_line = {
+                            "machine_name": "{}".format(self.machine_name),
                             "process_name":"{}".format(process_name),
                             "command_line":"{}".format(command_line),
                             "creation_date":"{}".format(creation_date),
@@ -245,6 +255,7 @@ class ProcessParser:
 
                     if self.is_json:
                         json_line = {
+                            "machine_name": "{}".format(self.machine_name),
                             "process_name":"{}".format(process_name),
                             "proc_path":"{}".format(proc_path),
                             "proc_id":"{}".format(proc_id)
@@ -295,8 +306,8 @@ class ProcessParser:
 
                     if self.is_json:
                         json_line = {
-                            "date":"{}".format(date),
-                            "time":"{}".format(time),
+                            "machine_name": "{}".format(self.machine_name),
+                            "date_time": "{} {}".format(date, time),
                             "type_action":"{}".format(type_action),
                             "parent_id":"{}".format(parent_id),
                             "proc_id":"{}".format(proc_id),
@@ -351,6 +362,7 @@ class ProcessParser:
 
                     if self.is_json:
                         json_line = {
+                            "machine_name": "{}".format(self.machine_name),
                             "file_name":"{}".format(file_name),
                             "running":"{}".format(running),
                             "registry": "{}".format(registry),
@@ -398,8 +410,8 @@ class ProcessParser:
                         l_res.append(res)
                         if self.is_json:
                             json_line = {
-                                "date": "{}".format(date),
-                                "time": "{}".format(time),
+                                "machine_name": "{}".format(self.machine_name),
+                                "date_time": "{} {}".format(date, time),
                                 "name": "{}".format(name),
                                 "launchstr": "{}".format(launchstr),
                                 "enabled": "{}".format(enabled)
