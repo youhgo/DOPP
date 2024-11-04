@@ -11,7 +11,7 @@ The Endpoint is waiting for the archive file and a json parameter
 
 The Json parameter must look like that
 ```json
-{"caseName": "name_of_your_case"}
+{"caseName": "name_of_your_case", "machineName": "Name_of_the_machine_analyzed"}
 ```
 
 It is possible to configure the tools you want to launch or not using the "config" parameter.
@@ -19,6 +19,7 @@ The final JSON must look like that :
 ```json
 {
   "caseName": "Name_Of_Your_Case" ,
+  "machineName": "Name_of_the_machine_analyzed",
   "config":{
   "EvtxToJson": 1,
   "ParseEvtx": 1,
@@ -43,7 +44,7 @@ By default, all tools are set to 1.
 
 For exemple, send an archive through Curl :
 ```bash
-curl -X POST -k https://DOPP.localhost/api/parse/parse_archive -F file=@"/home/hro/Documents/cyber/working_zone/archive_orc/PC1.7z" -F json='{"caseName":"test"}'
+curl -X POST -k https://DOPP.localhost/api/parse/parse_archive -F file=@"/home/hro/Documents/cyber/working_zone/archive_orc/PC1.7z" -F json='{"caseName":"test", "machineName":"DesktopForest"}'
 {
   "debugLogUrl":"https://DOPP.localhost/api/debug_log/b16b2be6-0c04-4540-96e9-ab922c27b2f7",
   "message":"your parsing request has been send to queue",
