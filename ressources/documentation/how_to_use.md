@@ -5,7 +5,12 @@ DOPP is really easy to use thanks to the API
 ## DOPP API
 
 ### Parsing URL
-The API Endpoint to send an archive is this one: https://youDOPPAdress/api/parse/parse_archive
+The API Endpoint to send an archive is this one:
+
+```bash
+https://youDOPPAdress/api/parse/parse_archive
+```
+
 
 The Endpoint is waiting for the archive file and a json parameter
 
