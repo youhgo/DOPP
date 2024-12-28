@@ -1,0 +1,12 @@
+Plugins:
+  - RegistryToTimeline:
+      archives: ["General", "Full", "Little", "*"]
+      sub_archives: ["SAM.7z", "UserHives.7z", "SystemHives.7z"]
+      match_pattern: ".*data$"
+      sourcetype: "Registry"
+
+  - EventLogsToTimeline:
+      archives: ["General", "Full", "Little"]
+      sub_archives: ["Event.7z"]
+      match_pattern: ".*evtx.*data$"
+      sourcetype: "Event"

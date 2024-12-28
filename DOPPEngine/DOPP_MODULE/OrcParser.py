@@ -36,11 +36,11 @@ class OrcPaser:
         :param artefact_config: json/dict artefact config
         """
         self.tool_path = os.environ.get("TOOL_PATH", "python-docker/DOPP_MODULE/outils")
-        self.evtx_dump_path_old = os.path.join(self.tool_path, "evtx_dump")
         self.evtx_dump_path = os.path.join(self.tool_path, "evtx_dump")
         self.ese_analyst_path = os.path.join(self.tool_path, "ese-analyst/ese2csv.py")
         self.ese_analyst_plugin_path = os.path.join(self.tool_path, "ese-analyst/srudb_plugin.py")
         self.hayabusa_tool_path = os.path.join(self.tool_path, "hayabusa-2.17.0-linux-intel/hayabusa-2.17.0-lin-x64-gnu")
+        self.analyze_mft_tool_path = "/python-docker/analyzeMFT/analyzeMFT.py"
         self.clean_duplicates_tool_path = os.path.join(self.tool_path, "clean_duplicate.sh")
 
         self.master_id = master_id
@@ -505,7 +505,8 @@ class OrcPaser:
                 mft_files = mngr.recursive_file_search(self.extracted_dir,mft_patern)
                 if mft_files:
                     for mft_file in mft_files:
-                        my_cmd = ["analyze_mft", "-f", "{}".format(mft_file),
+                        my_cmd = ["python3", "{}".format(self.analyze_mft_tool_path),
+                                  "-f", "{}".format(mft_file),
                                   "-o", "{}".format(mft_result_file)]
                         subprocess.run(my_cmd)
                         mft_parser = DiskParser.DiskParser(self.result_parsed_dir, self.machine_name, True,
@@ -540,7 +541,7 @@ class OrcPaser:
 
     def launch_hayabusa_subprocess(self):
         """
-        To parse mft file with analyse mft and parse it to human readble format (|DATE|TIME|ETC|ETC)
+        To launch Hayabusa tool
         :return:
         """
         try:

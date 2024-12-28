@@ -13,7 +13,8 @@ To have more info about DOPP:
 The purpose of DOPP is to provide the necessary tools for parsing Windows artifacts (event logs, MFT, registry hives, amcache, etc.) as part of a digital forensics investigation.
 Dopp produces extremely simple and readable results, allowing analysts to find the information they need directly.
 
-Dopp was designed to process archives provided by the [DFIR-ORC](https://github.com/dfir-orc) collection tool from ANSSI but will be compatible with all formats soon.
+Dopp is designed to process archives provided by the [DFIR-ORC](https://github.com/dfir-orc) collection tool from ANSSI.
+It is also compatible with all archive containing raw artefact(eg evtx files, mft, registry.hve etc).
 
 DOPP is:
 

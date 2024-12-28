@@ -19,11 +19,21 @@ RUN apt-get install -y \
     python3-pip \
     nano \
     git
-RUN apt-get upgrade -y
 
-RUN pip3 uninstall blinker
+
+RUN apt-get upgrade -y
+RUN pip3 install --upgrade pip
+#RUN pip3 install "git+https://github.com/rowingdude/analyzeMFT"
+COPY DOPP_MODULE/docker_files/install_analyzemft.sh install_analyzemft.sh
+RUN ./install_analyzemft.sh
+
+
 COPY DOPP_MODULE/docker_files/install_rr.sh install_rr.sh
 RUN ./install_rr.sh
+
+COPY DOPP_MODULE/docker_files/install_orc2timeline.sh install_orc2timeline.sh
+COPY DOPP_MODULE/docker_files/orc2timeline.yaml orc2timeline.yaml
+RUN ./install_orc2timeline.sh
 
 COPY DOPP_MODULE/docker_files/requirements.txt requirements.txt
 RUN pip3 install -U setuptools pip
