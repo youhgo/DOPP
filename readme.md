@@ -95,6 +95,7 @@ Dopp uses externals tools listed here :
 * [regpy](https://pypi.org/project/regipy/)
 * [MaximumPlasoParser](https://github.com/Xbloro/maximumPlasoTimelineParser)
 *  [HAYABUSA](https://github.com/Yamato-Security/hayabusa)
+* [orc2Timeline](https://github.com/ANSSI-FR/orc2timeline/blob/main/LICENSE)
 
 ## How does it work ?
 ![](./ressources/images/DOPP.png)
