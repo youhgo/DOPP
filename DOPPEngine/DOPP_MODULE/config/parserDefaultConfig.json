@@ -9,8 +9,9 @@
   "parseUserHivesRr": 0,
   "parseSystemHivesRegipy" : 0,
   "parseLnk": 0,
-  "parseMft": 1,
+  "parseMft": 0,
   "hayabusa": 0,
+  "orc2timeline": 1,
   "plaso": 0,
   "mpp": 0
  }

@@ -2,7 +2,7 @@
 
 <wolf childdebug="no" command_timeout="84600">
 
-    <archive name="DFIR-ORC_{SystemType}_{FullComputerName}.7z" keyword="All" concurrency="2" repeat="Once" compression="fast" archive_timeout="84600">
+    <archive name="DFIR-ORC_{SystemType}_{FullComputerName}_Full.7z" keyword="All" concurrency="2" repeat="Once" compression="fast" archive_timeout="84600">
     
     <!-- System########################################################################################################################################### -->
 

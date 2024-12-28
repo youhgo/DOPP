@@ -41,6 +41,7 @@ class OrcPaser:
         self.ese_analyst_plugin_path = os.path.join(self.tool_path, "ese-analyst/srudb_plugin.py")
         self.hayabusa_tool_path = os.path.join(self.tool_path, "hayabusa-2.17.0-linux-intel/hayabusa-2.17.0-lin-x64-gnu")
         self.analyze_mft_tool_path = "/python-docker/analyzeMFT/analyzeMFT.py"
+        self.orc2timeline_tool_path = "/python-docker/orc2timeline/"
         self.clean_duplicates_tool_path = os.path.join(self.tool_path, "clean_duplicate.sh")
 
         self.master_id = master_id
@@ -70,6 +71,7 @@ class OrcPaser:
         self.hiveDirRegipy = os.path.join(self.hiveDir, "hives_regipy")
 
         self.mftDir = os.path.join(self.parsed_dir, "mft")
+        self.orc2timelineDir = os.path.join(self.parsed_dir, "orc2timeline")
         self.artefactsDir = os.path.join(self.parsed_dir, "artefact")
         self.prefetchDir = os.path.join(self.parsed_dir, "prefetch")
         self.srumDir = os.path.join(self.parsed_dir, "SRUM")
@@ -136,6 +138,7 @@ class OrcPaser:
             os.makedirs(self.lnkDir, exist_ok=True)
             os.makedirs(self.result_parsed_dir, exist_ok=True)
             os.makedirs(self.json_dir, exist_ok=True)
+            os.makedirs(self.orc2timelineDir, exist_ok=True)
 
             self.logger_run = LoggerManager.LoggerManager("running", self.running_log_file_path, "INFO")
             self.logger_debug = LoggerManager.LoggerManager("debug", self.debug_log_file_path, "DEBUG")
@@ -569,6 +572,25 @@ class OrcPaser:
             self.logger_run.print_info_failed_sub_1("[HAYABUSA]")
             self.logger_debug.print_error_failed(traceback.format_exc())
 
+    def launch_orc2timeline_subprocess(self):
+        """
+        To launch orc2timeline tool
+        :return:
+        """
+        try:
+            self.logger_run.print_info_start_sub_1("[ORC2TIMELINE]")
+            orc2timeline_result_file = os.path.join(self.orc2timelineDir, "orc2timeline.gz")
+
+            my_cmd = ["orc2timeline", "process", "{}".format(self.path_to_orc),
+                      "{}".format(orc2timeline_result_file), "--overwrite"]
+            subprocess.run(my_cmd)
+
+            self.logger_run.print_info_finished_sub_1("[ORC2TIMELINE]")
+
+        except:
+            self.logger_run.print_info_failed_sub_1("[ORC2TIMELINE]")
+            self.logger_debug.print_error_failed(traceback.format_exc())
+
     def clean_duplicates_subprocess(self, dir_to_clean):
 
         """
@@ -834,6 +856,11 @@ class OrcPaser:
             self.logger_run.print_info_start("[HAYABUSA]")
             self.launch_hayabusa_subprocess()
             self.logger_run.print_info_finished("[HAYABUSA]")
+
+        if self.parser_config.get('orc2timeline'):
+            self.logger_run.print_info_start("[ORC2TIMELINE]")
+            self.launch_orc2timeline_subprocess()
+            self.logger_run.print_info_finished("[ORC2TIMELINE]")
 
         self.clean_duplicates(self.result_parsed_dir) # Need to be fixed
 

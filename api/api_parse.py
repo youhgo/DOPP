@@ -31,7 +31,8 @@ def parse_archive():
     try:
         rand = randint(1000, 5000)
         file = request.files['file']
-        file_name = file.filename + "__{}".format(rand)
+        #file_name = file.filename + "__{}".format(rand)
+        file_name = file.filename
         file_path = os.path.join(DEPOT_FOLDER_PATH, file_name)
         file.save(file_path)
         content = json.loads(request.form['json'])
