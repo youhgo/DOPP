@@ -100,6 +100,7 @@ class MaximumPlasoParserJson:
             "taskScheduler": re.compile(r'.*TaskScheduler%4Operational\.evtx'),
             "bits": re.compile(r'.*Bits-Client%4Operational\.evtx'),
             "rdp_local": re.compile(r'.*TerminalServices-LocalSessionManager%4Operational\.evtx'),
+            "rdp_remot": re.compile(r'.*TerminalServices-RemoteConnectionManager%4Operational\.evtx'),
             "powershell": re.compile(
                 r'(.*Microsoft-Windows-PowerShell%4Operational\.evtx)|(.*Windows_PowerShell\.evtx)'),
             "wmi": re.compile(r'.*Microsoft-Windows-WMI-Activity%4Operational\.evtx'),
@@ -111,9 +112,10 @@ class MaximumPlasoParserJson:
         self.d_regex_artefact_by_source_name = {
             "security": re.compile(r'Microsoft-Windows-Security-Auditing'),
             "system": re.compile(r'Service Control Manager'),
-            "taskScheduler": re.compile(r'.*TaskScheduler%4Operational\.evtx'),
+            "taskScheduler": re.compile(r'Microsoft-Windows-TaskScheduler'),
             "bits": re.compile(r'Microsoft-Windows-Bits-Client'),
             "rdp_local": re.compile(r'Microsoft-Windows-TerminalServices-LocalSessionManager'),
+            "rdp_remote": re.compile(r'Microsoft-Windows-TerminalServices-RemoteConnectionManager'),
             "powershell": re.compile(r'(Microsoft-Windows-PowerShell)|(PowerShell)'),
             "wmi": re.compile(r'Microsoft-Windows-WMI-Activity'),
             "application_experience": re.compile(r'Microsoft-Windows-Application-Experience'),
@@ -335,7 +337,7 @@ class MaximumPlasoParserJson:
         if self.config.get("windows_Start_Stop", 0):
             self.windows_start_stop_res_file_csv = self.initialise_result_file_csv(self.l_csv_header_start_stop,
                                                                                    "winStartStop")
-        if self.config.get("taskScheduler", 0):
+        if self.config.get("task_scheduler", 0):
             self.task_scheduler_file_csv = self.initialise_result_file_csv(self.l_csv_header_tscheduler,
                                                                            "taskScheduler")
 
@@ -437,7 +439,7 @@ class MaximumPlasoParserJson:
         if self.config.get("windows_Start_Stop", 0):
             self.windows_start_stop_res_file_json = self.initialise_result_file_json("windows_start_stop")
 
-        if self.config.get("taskScheduler", 0):
+        if self.config.get("task_scheduler", 0):
             self.task_scheduler_file_json = self.initialise_result_file_json("task_scheduler")
 
         if self.config.get("remote_rdp", 0):
@@ -771,7 +773,9 @@ class MaximumPlasoParserJson:
         if log_type == "system":
             self.parse_system_evtx(line)
         if log_type == "rdp_local":
-            self.parse_rdp(line)
+            self.parse_rdp_local(line)
+        if log_type == "rdp_remote":
+            self.parse_rdp_remote(line)
         if log_type == "powershell":
             self.parse_powershell(line)
         if log_type == "wmi":
@@ -900,9 +904,20 @@ class MaximumPlasoParserJson:
             self.wmi_file_json.write('\n')
 
     #  ----------------------------------------  RDP ---------------------------------------------
-    def parse_rdp(self, event):
+    def parse_rdp_local(self, event):
         """
-        Main function to parse rdp type logs
+        Main function to parse rdp local type logs
+        :param event: (dict) dict containing one line of the plaso timeline,
+        :return: None
+        """
+        event_code = event.get("event_identifier")
+        if self.local_rdp_file_csv or self.local_rdp_file_json:
+            if str(event_code) in ["21", "24", "25", "39", "40"]:
+                self.parse_rdp_local_evtx_from_xml(event)
+
+    def parse_rdp_remote(self, event):
+        """
+        Main function to parse rdp remot type logs
         :param event: (dict) dict containing one line of the plaso timeline,
         :return: None
         """
@@ -910,9 +925,6 @@ class MaximumPlasoParserJson:
         if self.remote_rdp_file_csv or self.remote_rdp_file_json:
             if str(event_code) in ["1149"]:
                 self.parse_rdp_remote_evtx_from_xml(event)
-        if self.local_rdp_file_csv or self.local_rdp_file_json:
-            if str(event_code) in ["21", "24", "25", "39", "40"]:
-                self.parse_rdp_local_evtx_from_xml(event)
 
     def parse_rdp_remote_evtx_from_xml(self, event):
         """
@@ -1553,6 +1565,7 @@ class MaximumPlasoParserJson:
         :param event: (dict) dict containing one line of the plaso timeline,
         :return: None
         """
+
         ts_date, ts_time = self.convert_epoch_to_date(event.get("timestamp"))
         evt_as_xml = event.get("xml_string")
         evt_as_json = xmltodict.parse(evt_as_xml)
